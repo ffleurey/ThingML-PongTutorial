@@ -1,0 +1,168 @@
+import "Bounce.thingml"
+
+thing SDL2BounceApp includes BounceApp
+@c_header "
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>"
+
+@c_global "
+SDL_Window* window = NULL;
+SDL_Renderer* renderer = NULL;
+"
+{
+	
+	readonly property TTF_FONT_PATH : String = "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf"
+	
+	property color : Color = Color:white
+	property scale : UInt8 = 5
+	
+	
+	function startEventPolling() 
+	@fork_linux_thread "true"
+	do
+		'SDL_Event event;'
+        while( true ) do
+        	'SDL_WaitEvent(&event);' // Blocks until a new event is available
+        	if('event.type == SDL_WINDOWEVENT') do
+        		if ('event.window.event == SDL_WINDOWEVENT_CLOSE') do 
+        			destroyDisplay()
+        			'exit(0);'
+        		end
+        	end
+        end
+	end
+	
+	function initDisplay() do
+
+		// Create Window
+		'window = SDL_CreateWindow
+	    (	"ThingML / SDL2 Window", SDL_WINDOWPOS_UNDEFINED,
+	        SDL_WINDOWPOS_UNDEFINED,
+	        '&(XSIZE-1) * scale&', '&(YSIZE-1) * scale&', SDL_WINDOW_SHOWN	);'
+	    
+	    // Setup renderer
+		'renderer =  SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);'
+		
+		'SDL_RenderSetScale(renderer, '&scale&', '&scale&');'
+
+		'TTF_Init();'
+
+		clearScreen()
+		startEventPolling() 	    
+	end
+	
+	function destroyDisplay() do
+		'SDL_DestroyWindow(window);
+    	SDL_Quit();'
+	end
+	
+	function clearScreen() do 
+		'SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );'
+		'SDL_RenderClear( renderer );'
+		'SDL_RenderPresent(renderer);'
+	end
+	
+	function setColor(c : Color) color = c 
+	
+	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+		'SDL_Rect r;
+	    r.x = '&x &';
+	    r.y = '&y &';
+	    r.w = '&width&';
+	    r.h = '&height&';'
+	
+	    // Set render color
+	    if (color == Color:black) 'SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );'
+		else if (color == Color:white) 'SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );'
+	
+	    // Render rect
+	    'SDL_RenderDrawRect( renderer, &r );'
+	
+	    // Render the rect to the screen
+	    'SDL_RenderPresent(renderer);'	
+	end
+	
+	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+		'SDL_Rect r;
+	    r.x = '&x&';
+	    r.y = '&y&';
+	    r.w = '&width&';
+	    r.h = '&height&';'
+	
+	    // Set render color
+	    if (color == Color:black) 'SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );'
+		else if (color == Color:white) 'SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );'
+
+	    // Render rect
+	    'SDL_RenderFillRect( renderer, &r );'
+	
+	    // Render the rect to the screen
+	    'SDL_RenderPresent(renderer);'	
+	end
+	
+	function drawText(x : UInt8, y : UInt8, size : UInt8, text : String) do
+		'TTF_Font* Sans = TTF_OpenFont('&TTF_FONT_PATH&', 20);'
+		if ('Sans == NULL') do
+			print "[ERROR] SDL2BounceApp: TTF font file could not be loaded. Text will not be rendered.\n"
+		end
+		else do
+			'SDL_Color White = {255, 255, 255};'
+			'SDL_Surface* surfaceMessage = TTF_RenderText_Solid(Sans, '&text&', White);'
+			'SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);'
+			'SDL_Rect Message_rect; //create a rect
+			Message_rect.x = '&x&';  //controls the rects x coordinate 
+			Message_rect.y = '&y-10&'; // controls the rects y coordinte
+			Message_rect.w = 100; // controls the width of the rect
+			Message_rect.h = 30; // controls the height of the rect
+	
+			SDL_RenderCopy(renderer, Message, NULL, &Message_rect);
+			
+			SDL_FreeSurface(surfaceMessage);
+			SDL_DestroyTexture(Message); '
+			
+			'SDL_RenderPresent(renderer);'	
+		end
+	end
+	
+}
+
+protocol Timer;
+
+configuration SDL2BounceCfg 
+	@add_c_libraries "SDL2 SDL2_ttf"
+{
+	instance a : SDL2BounceApp
+	connector a.clock over Timer 
+	
+	instance b1 : BouncingBall
+	connector b1.clock over Timer
+	set b1.dx = -105
+	set b1.dy = 190
+	
+	instance b2 : BouncingBall
+	connector b2.clock over Timer
+	set b2.dx = 155
+	set b2.dy = -138
+	
+	instance b3 : BouncingBall
+	connector b3.clock over Timer
+	set b3.dx = -85
+	set b3.dy = -257
+	
+	instance b4 : BouncingBall
+	connector b4.clock over Timer
+	set b4.dx = 192
+	set b4.dy = -62
+	
+	instance b5 : BouncingBall
+	connector b5.clock over Timer
+	set b5.dx = 78
+	set b5.dy = 135
+	
+	connector a.ball => b1.ball
+	connector a.ball => b2.ball
+	connector a.ball => b3.ball
+	connector a.ball => b4.ball
+	connector a.ball => b5.ball
+}
+

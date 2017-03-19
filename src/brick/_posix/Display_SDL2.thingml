@@ -1,0 +1,117 @@
+import "../Display.thingml"
+import "../Controller.thingml"
+
+thing SDL2Display includes Display, Controller
+@c_header "
+#include <SDL2/SDL.h>
+"
+
+@c_global "
+SDL_Window* window = NULL;
+SDL_Renderer* renderer = NULL;
+"
+{
+	property scale 	: UInt8 = 5
+	property xctrl : Int16 = 0
+	
+	property XFRAMESIZE : UInt16
+	property YFRAMESIZE : UInt16
+	
+	function updateControl(dx : Int16) do
+		xctrl = xctrl + dx
+		if (xctrl > 100) xctrl = 100
+		else if (xctrl < -100) xctrl = -100
+		controls!position(xctrl, 0)
+	end
+	
+	function startEventPolling() 
+	@fork_linux_thread "true"
+	do
+		'SDL_Event event;'
+        while( true ) do
+        	'SDL_WaitEvent(&event);' // Blocks until a new event is available
+        	if('event.type == SDL_WINDOWEVENT') do
+        		if ('event.window.event == SDL_WINDOWEVENT_CLOSE') do 
+        			destroyDisplay()
+        			'exit(0);'
+        		end
+        	end
+        	else if ('event.type == SDL_KEYDOWN') do
+        		'switch(event.key.keysym.sym) {'
+        			'case SDLK_LEFT:  ' updateControl(-10) ' break;'
+        			'case SDLK_RIGHT: ' updateControl(10) ' break;'
+        		'}'
+        	end
+        	else if ('event.type == SDL_MOUSEMOTION') do
+        		var mousex : UInt16 = 'event.motion.x'
+        		var mousey : UInt16 = 'event.motion.y'
+        		xctrl = ((mousex - XFRAMESIZE/2)*220) / XFRAMESIZE
+        		updateControl(0)
+        	end
+        	
+        	
+        end
+	end
+	
+	function initDisplay(xsize : UInt8, ysize : UInt8) do
+
+		XFRAMESIZE = (xsize-1) * scale
+		YFRAMESIZE = (ysize-1) * scale
+
+		// Create Window
+		'window = SDL_CreateWindow
+	    (	"ThingML / SDL2 Window", SDL_WINDOWPOS_UNDEFINED,
+	        SDL_WINDOWPOS_UNDEFINED,
+	        '&XFRAMESIZE&', '&YFRAMESIZE&', SDL_WINDOW_SHOWN	);'
+	    
+	    // Setup renderer
+		'renderer =  SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);'
+		
+		'SDL_RenderSetScale(renderer, '&scale&', '&scale&');'
+
+		clearScreen()
+		startEventPolling()
+		display!displayReady()
+		updateControl(0)
+	end
+	
+	function destroyDisplay() do
+		'SDL_DestroyWindow(window);
+    	SDL_Quit();'
+	end
+	
+	function clearScreen() do 
+		'SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );'
+		'SDL_RenderClear( renderer );'
+		'SDL_RenderPresent(renderer);'
+	end
+	
+	function setColor(r : UInt8, g : UInt8, b : UInt8) do
+		'SDL_SetRenderDrawColor( renderer, '&r&', '&g&', '&b&', 255);'
+	end 
+	
+	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+		'SDL_Rect r;
+	    r.x = '&x &';
+	    r.y = '&y &';
+	    r.w = '&width&';
+	    r.h = '&height&';'
+
+	    'SDL_RenderDrawRect( renderer, &r );'
+	end
+	
+	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+		'SDL_Rect r;
+	    r.x = '&x&';
+	    r.y = '&y&';
+	    r.w = '&width&';
+	    r.h = '&height&';'
+
+	    'SDL_RenderFillRect( renderer, &r );'
+	end
+	
+	function updateDisplay() do
+		'SDL_RenderPresent(renderer);'
+	end
+	
+}

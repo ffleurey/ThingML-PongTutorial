@@ -1,0 +1,16 @@
+import "_Timer.thingml"
+
+thing fragment ControllerMsgs {
+	
+	message position(x : Int16, y : Int16)
+	message fire()
+	
+}
+
+thing fragment Controller includes ControllerMsgs {
+	
+	provided port controls {
+		sends position, fire
+	}
+	
+}

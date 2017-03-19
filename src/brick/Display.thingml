@@ -1,0 +1,63 @@
+import "_Datatypes.thingml"
+
+thing fragment DisplayMsgs {
+	
+	message clear()
+	message setColor(r : UInt8, g : UInt8, b : UInt8)
+	message drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8)
+	message fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8)
+	//message drawLine(x1 : UInt8, y1 : UInt8, x2 : UInt8, y2 : UInt8)
+	//message drawPixel(x : UInt8, y : UInt8)
+	
+	message create(xsize : UInt8, ysize : UInt8);
+	message destroy();
+	message update();
+	
+	message displayReady();
+	message displayError();
+
+}
+
+thing fragment Display includes DisplayMsgs {
+	
+	abstract function initDisplay(xsize : UInt8, ysize : UInt8) @abstract "true"
+	abstract function destroyDisplay() @abstract "true"
+	abstract function updateDisplay() @abstract "true"
+	
+	abstract function clearScreen() @abstract "true"
+	abstract function setColor(r : UInt8, g : UInt8, b : UInt8) @abstract "true"
+	abstract function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) @abstract "true"
+	abstract function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) @abstract "true"
+	
+
+	
+	provided port display {
+		receives create, destroy, update
+		receives clear, setColor, drawRect, fillRect
+		sends displayReady, displayError
+	}
+	
+	statechart init Wait {
+		
+		state Wait {
+			transition -> Running event e : display?create action initDisplay(e.xsize, e.ysize)	
+		}
+		
+		state Running {
+			
+			on entry display!displayReady()
+			
+			internal event e : display?setColor action setColor(e.r, e.g, e.b)
+			internal event e : display?clear action clearScreen()
+			internal event e : display?drawRect action drawRect(e.x, e.y, e.width, e.height)
+			internal event e : display?fillRect action fillRect(e.x, e.y, e.width, e.height)
+			internal event e : display?update action updateDisplay()
+			
+			transition -> Destroyed event display?destroy action destroyDisplay()	
+		}
+		
+		state Destroyed {
+			// Nothing
+		}
+	}
+}

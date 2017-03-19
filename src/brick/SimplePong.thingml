@@ -1,0 +1,154 @@
+import "_Timer.thingml"
+import "Display.thingml"
+import "Controller.thingml"
+
+thing SimplePong includes TimerMsgs, DisplayMsgs, ControllerMsgs {
+	
+	required port clock {
+		sends timer_start, timer_cancel
+		receives timer_timeout
+	}
+
+	required port display {
+		receives displayReady, displayError
+		sends create, fillRect, drawRect, clear, setColor, update
+	}
+	
+	required port controller {
+		receives position
+	}
+	
+	// Size of the real display
+	readonly property XDISPSIZE : UInt8 = 160
+	readonly property YDISPSIZE : UInt8 = 128
+	
+	// Virtual size of the "game area"
+	readonly property SCALE : UInt16 = 64
+	readonly property XMAX 	: UInt16 = XDISPSIZE * SCALE
+	readonly property YMAX 	: UInt16 = YDISPSIZE * SCALE
+	
+	// Walls around the play area
+	property TOP 	: Int16 = 12 * SCALE 		// Leave 12 pixels on the top for scores
+	property BOTTOM	: Int16 = YMAX + 8 * SCALE	// The bottom wall is off the screen
+	property LEFT	: Int16 = 2 * SCALE			// One pixel for the left wall	
+	property RIGHT	: Int16 = XMAX - 2 * SCALE	// One pixel for the right wall	
+	
+	// Ball variables
+	property br : Int16 = 3 * SCALE 			// Radius of the ball
+	property bx : Int16 = XMAX / 2				// Center of the ball
+	property by : Int16 = YMAX / 2				// Center of the ball
+	property dx : Int16 = XMAX / 98			// Horizontal speed of the ball
+	property dy : Int16 = XMAX / 65			// Vertical speed of the ball
+	
+	// Pad variables
+	property padx 	: Int16 = YMAX / 2			// Middle of the pad
+	property pady 	: Int16 = YMAX - 6 * SCALE	// Top of the pad
+	property padlen : Int16 = XMAX / 6			// Length of the pad
+
+	// Variables used by the drawBall function to erase the previous ball
+	property prevBX	: Int16 = -1
+	property prevBY	: Int16 = -1 
+	
+	function drawBall() do
+		var bs : UInt8 = (br*2)/SCALE 	// Size of the ball on the actual display
+		
+		if (prevBX > 0) do				// Erase the previous ball
+			display!setColor(0,0,0)
+			display!fillRect(prevBX, prevBY, bs, bs)
+		end
+		
+		// Compute new position of the ball on the actual display
+		prevBX = (bx-br)/SCALE
+		prevBY = (by-br)/SCALE
+		
+		display!setColor(255,255,255)
+		display!fillRect(prevBX, prevBY, bs, bs)
+	end
+
+	
+	// Variables used by the drawPad function to erase the previous pad
+	property prevPX	: Int16 = -1
+	property prevPY	: Int16 = -1 
+	
+	function drawPad() do
+		var ps : UInt8 = padlen/SCALE 	// Size of the pad on the actual display
+	
+		if (prevPX > 0) do				// Erase the previous ball
+			display!setColor(0,0,0)
+			display!fillRect(prevPX, prevPY, ps, 4)
+		end
+		
+		prevPX = (padx - (padlen/2)) / SCALE
+		prevPY = pady / SCALE
+		
+		display!setColor(255,255,255)
+		display!fillRect(prevPX, prevPY, ps, 4)
+	end
+	
+	function drawWalls() do
+		display!setColor(255,255,255)
+		display!fillRect(LEFT/SCALE-1, TOP/SCALE-1, (RIGHT-LEFT)/SCALE+1, 1)
+		display!fillRect(LEFT/SCALE-1, BOTTOM/SCALE-1, (RIGHT-LEFT)/SCALE+1, 1)
+		display!fillRect(LEFT/SCALE-1, TOP/SCALE, 1, (BOTTOM-TOP)/SCALE)
+		display!fillRect(RIGHT/SCALE-1, TOP/SCALE, 1, (BOTTOM-TOP)/SCALE)
+	end
+	
+	statechart SC init INIT {
+		
+		state INIT {
+			on entry display!create(XDISPSIZE, YDISPSIZE)
+			transition -> PLAY event display?displayReady action do
+				display!clear()
+				drawWalls()
+			end
+		}
+		
+		state PLAY {
+
+			on entry clock!timer_start(0, 33)
+			
+			internal event e : controller?position action do
+				// Map the controller values [-100..100] to the pad position
+				var center : Int16 = (RIGHT - LEFT) / 2
+				padx = LEFT + center + (e.x * (RIGHT - LEFT - padlen)) / 200
+			end
+				
+			transition -> PLAY event t : clock?timer_timeout guard t.id == 0 action do
+			
+				// Draw the Pad
+				drawPad()
+			
+				// Calculate the position of the new ball
+				bx = bx + dx
+				by = by + dy
+				
+				var wl : UInt16 = LEFT + br
+				var wr : UInt16 = RIGHT - br
+				var wt : UInt16 = TOP + br
+				var wb : UInt16 = BOTTOM - br
+				
+				// Check for collisions with the walls
+				if (bx < wl) 		do	dx = -dx 	bx = 2*wl-bx	end
+				else if (bx > wr)	do	dx = -dx	bx = 2*wr-bx	end
+				if (by < wt)		do	dy = -dy	by = 2*wt-by	end
+				else if (by > wb)	do	dy = -dy	by = 2*wb-by	end
+				
+				
+				// check for collision with the pad
+				if (dy > 0) do // the ball has to be going down
+					if (by > pady-br and by < pady+br ) do // Collision on the Y axis
+						if (bx > padx-padlen/2 and bx < padx+padlen/2) do // Collision on the X axis
+							dy = -dy 					// Bounce on the pad
+							by = 2*(pady-br)-by			// Adjust the position of the ball
+							dx = dx/4 + (bx-padx)/4		// Adjust horizontal speed
+						end
+					end
+				end
+				
+				drawBall()
+				display!update()
+				
+			end
+		}
+	}
+}
