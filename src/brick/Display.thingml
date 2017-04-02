@@ -37,7 +37,7 @@ thing fragment Display includes DisplayMsgs {
 		sends displayReady, displayError
 	}
 	
-	statechart init Wait {
+	statechart SC init Wait {
 		
 		state Wait {
 			transition -> Running event e : display?create action initDisplay(e.xsize, e.ysize)	

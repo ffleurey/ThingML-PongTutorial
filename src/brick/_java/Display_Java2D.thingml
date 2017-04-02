@@ -1,0 +1,42 @@
+import "../Display.thingml"
+import "../Controller.thingml"
+
+thing Java2DDisplay includes Display
+{
+	property scale 	: UInt8 = 5
+	property xctrl : Int16 = 0
+	
+	property XFRAMESIZE : UInt16
+	property YFRAMESIZE : UInt16
+	
+	function initDisplay(xsize : UInt8, ysize : UInt8) do
+
+		'// Init Display'
+		
+	end
+	
+	function destroyDisplay() do
+		'// Destroy Display'
+	end
+	
+	function clearScreen() do 
+		'// Clear Screen'
+	end
+	
+	function setColor(r : UInt8, g : UInt8, b : UInt8) do
+		'// Set Color'
+	end 
+	
+	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+		'// Draw Rect'
+	end
+	
+	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+		'// Fill Rect'
+	end
+	
+	function updateDisplay() do
+		'// Update Display'
+	end
+	
+}

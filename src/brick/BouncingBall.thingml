@@ -1,5 +1,5 @@
 import "_Timer.thingml"
-import "Display.thingml"
+import "Display.thingml" 
 
 thing BouncingBall includes TimerMsgs, DisplayMsgs {
 	

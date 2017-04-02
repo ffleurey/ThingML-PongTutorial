@@ -92,8 +92,8 @@ SDL_Renderer* renderer = NULL;
 	
 	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
 		'SDL_Rect r;
-	    r.x = '&x &';
-	    r.y = '&y &';
+	    r.x = '&x&';
+	    r.y = '&y&';
 	    r.w = '&width&';
 	    r.h = '&height&';'
 
