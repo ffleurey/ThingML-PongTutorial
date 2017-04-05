@@ -1,0 +1,75 @@
+import "Display.thingml"
+
+thing DrawThingML includes DisplayMsgs {
+	
+	required port display {
+		receives displayReady, displayError
+		sends create, fillRect, drawRect, clear, setColor, update
+	}
+	
+	// Size of the real display
+	readonly property XDISPSIZE : UInt8 = 160
+	readonly property YDISPSIZE : UInt8 = 128
+	
+	function drawThingML(x : Int16, y : Int16) do
+		
+		display!setColor(255,255,255) // WHITE
+		display!fillRect(x,y,108, 13)
+	
+		x = x+1
+		y = y+1
+	
+		display!setColor(80,80,80) // GREY
+		// T
+		display!fillRect(x+0,y+0,12,2)
+		display!fillRect(x+5,y+0,2,11)
+		// H
+		display!fillRect(x+18,y+0,2,11)
+		display!fillRect(x+27,y+0,2,11)
+		display!fillRect(x+18,y+5,11,2)
+		// I
+		display!fillRect(x+36,y+0,2,11)
+		// N
+		display!fillRect(x+44,y+0,2,11)
+		display!fillRect(x+46,y+1,1,3)
+		display!fillRect(x+47,y+2,1,3)
+		display!fillRect(x+48,y+3,1,3)
+		display!fillRect(x+49,y+4,1,3)
+		display!fillRect(x+50,y+5,1,3)
+		display!fillRect(x+51,y+6,1,3)
+		display!fillRect(x+52,y+7,1,3)
+		display!fillRect(x+53,y+0,2,11)
+		// G
+		display!fillRect(x+62,y+0,2,11)
+		display!fillRect(x+62,y+0,12,2)
+		display!fillRect(x+62,y+9,12,2)
+		display!fillRect(x+62,y+9,12,2)
+		display!fillRect(x+69,y+5,5,2)
+		display!fillRect(x+72,y+7,2,2)
+		
+		display!setColor(232,141,10) // ORANGE
+		// M
+		display!fillRect(x+80,y+0,11,2)
+		display!fillRect(x+80,y+0,2,11)
+		display!fillRect(x+85,y+0,2,11)
+		display!fillRect(x+89,y+0,2,11)
+		// L
+		display!fillRect(x+95,y+0,2,11)
+		display!fillRect(x+95,y+9,11,2)
+		
+	end
+	
+	statechart init DRAW {
+	
+		on entry display!create(XDISPSIZE, YDISPSIZE)
+	
+		state DRAW {
+			internal event display?displayReady action do
+				display!clear()
+				drawThingML(20,60)
+				display!update()
+			end
+		}
+	}
+}
+

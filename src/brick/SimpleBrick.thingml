@@ -189,7 +189,6 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 				if (by < wt)		do	dy = -dy	by = 2*wt-by	end
 				else if (by > wb)	do	dy = -dy	by = 2*wb-by	end
 				
-				
 				// check for collision with the pad
 				if (dy > 0) do // the ball has to be going down
 					if (by > pady-br and by < pady+br ) do // Collision on the Y axis
