@@ -2,41 +2,101 @@ import "../Display.thingml"
 import "../Controller.thingml"
 
 thing Java2DDisplay includes Display
+@java_import "
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;"
+
+@java_features "
+	protected JPanel canevas;
+	protected JFrame frame;
+	protected Graphics2D g2d;
+	
+	// Cache the colors which have been already created
+	protected Hashtable<String, Color> colors = new Hashtable<String, Color>();
+	protected Color getColor(int r, int g, int b) {
+		String key = new String() + r + ';' + g + ';' +  b;
+		if (colors.containsKey(key)) return colors.get(key);
+		else {
+			Color c = new Color(r,g,b);
+			colors.put(key, c);
+			return c;
+		}
+	}"
 {
-	property scale 	: UInt8 = 5
-	property xctrl : Int16 = 0
+	readonly property SCALE 	: UInt8 = 5
+	//property xctrl : Int16 = 0
 	
 	property XFRAMESIZE : UInt16
 	property YFRAMESIZE : UInt16
 	
 	function initDisplay(xsize : UInt8, ysize : UInt8) do
-
-		'// Init Display'
+		XFRAMESIZE = xsize
+		YFRAMESIZE = ysize
+		'
+		final BufferedImage displayBuffer = new BufferedImage('&XFRAMESIZE&', '&YFRAMESIZE&', BufferedImage.TYPE_INT_ARGB);
+		g2d = displayBuffer.createGraphics();
 		
+		canevas = new JPanel() {
+			  private static final long serialVersionUID = 1L;
+			  public void update(Graphics g) {
+				  paint(g);
+			  }
+			
+			  public void paint(Graphics g) {
+				  g.drawImage(displayBuffer, 0, 0, '&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&', 0, 0, '&XFRAMESIZE&', '&YFRAMESIZE&', null);
+			  }
+		};
+		canevas.setSize(new Dimension('&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&'));
+		canevas.setPreferredSize(new Dimension('&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&'));
+		
+		frame = new JFrame("ThingML Java2D Display") {
+            private static final long serialVersionUID = 1L;
+            public void processWindowEvent(java.awt.event.WindowEvent e) {
+                super.processWindowEvent(e);
+                if (e.getID() == java.awt.event.WindowEvent.WINDOW_CLOSING) {
+                    System.exit(0);
+                }
+              }
+        };
+        
+        frame.setBackground(Color.black);
+        frame.add(canevas);
+        frame.pack();
+        frame.setResizable(false);
+        frame.setVisible(true);
+        
+        canevas.repaint();'
 	end
 	
 	function destroyDisplay() do
-		'// Destroy Display'
+		'frame.setVisible(false);
+		frame.dispose();'
 	end
 	
 	function clearScreen() do 
-		'// Clear Screen'
+        'g2d.clearRect(0, 0, '&XFRAMESIZE&', '&YFRAMESIZE&');'
 	end
 	
 	function setColor(r : UInt8, g : UInt8, b : UInt8) do
-		'// Set Color'
+		'g2d.setColor(getColor('&r&','&g&','&b&'));'
 	end 
 	
 	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
-		'// Draw Rect'
+		'g2d.drawRect('&x&','&y&','&width&','&height&');'
 	end
 	
 	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
-		'// Fill Rect'
+		'g2d.fillRect('&x&','&y&','&width&','&height&');'
 	end
 	
 	function updateDisplay() do
-		'// Update Display'
+		'canevas.repaint();'
 	end
 	
 }
