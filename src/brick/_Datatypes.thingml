@@ -20,7 +20,7 @@ datatype Integer<2>
     @type_checker "Integer"
 	@c_type "int"
 	@c_byte_size "2"
-	@java_type "short"
+	@java_type "int"
 	@java_primitive "true"
     @scala_type "Short"
     @SenML_type "Double"
@@ -30,7 +30,7 @@ datatype UInt8<1>
     @type_checker "Integer"
 	@c_type "uint8_t"
 	@c_byte_size "1"
-	@java_type "byte"
+	@java_type "int"
 	@java_primitive "true"
     @scala_type "Byte"
     @SenML_type "Double";
@@ -39,7 +39,7 @@ datatype Int8<1>
     @type_checker "Integer"
 	@c_type "int8_t"
 	@c_byte_size "1"
-	@java_type "byte"
+	@java_type "int"
 	@java_primitive "true"
     @scala_type "Byte"
     @SenML_type "Double";
@@ -48,7 +48,7 @@ datatype UInt16<2>
     @type_checker "Integer"
 	@c_type "uint16_t"
 	@c_byte_size "2"
-	@java_type "short"
+	@java_type "int"
 	@java_primitive "true"
     @scala_type "Short"
     @SenML_type "Double";
@@ -57,7 +57,7 @@ datatype Int16<2>
     @type_checker "Integer"
 	@c_type "int16_t"
     @c_byte_size "2"
-	@java_type "short"
+	@java_type "int"
 	@java_primitive "true"
     @scala_type "Short"
     @SenML_type "Double";

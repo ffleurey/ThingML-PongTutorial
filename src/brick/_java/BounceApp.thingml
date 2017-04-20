@@ -1,16 +1,16 @@
 import "Display_Java2D.thingml"
 import "../BouncingBall.thingml"
 import "../Display.thingml"
-
-protocol Timer;
+import "TimerJava.thingml"
 
 configuration BounceSDL2 
 {
 	
 	instance bb : BouncingBall
 	instance disp : Java2DDisplay
+	instance timer : TimerJava
 	
-	connector bb.clock over Timer
+	connector bb.clock => timer.timer
 	connector bb.display => disp.display
 	
 }

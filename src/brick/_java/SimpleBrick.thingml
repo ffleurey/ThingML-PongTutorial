@@ -1,0 +1,19 @@
+import "Display_Java2D.thingml"
+import "../SimpleBrick.thingml"
+import "../Display.thingml"
+import "../DummyController.thingml"
+import "TimerJava.thingml"
+
+configuration SimpleBrickSDL2 
+{
+	instance bb : SimpleBrick
+	instance disp : Java2DDisplay
+	instance ctrl : DummyController
+	instance timer : TimerJava
+	
+	connector bb.clock => timer.timer
+    connector ctrl.clock => timer.timer
+	
+	connector bb.display => disp.display
+	connector bb.controller => ctrl.controls
+}

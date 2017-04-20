@@ -88,7 +88,7 @@ import javax.swing.JPanel;"
 	end 
 	
 	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
-		'g2d.drawRect('&x&','&y&','&width&','&height&');'
+		'g2d.drawRect('&x&','&y&','&width-1&','&height-1&');'
 	end
 	
 	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do

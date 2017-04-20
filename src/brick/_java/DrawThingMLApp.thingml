@@ -1,0 +1,17 @@
+import "Display_Java2D.thingml"
+import "../DrawThingML.thingml"
+import "../Display.thingml"
+
+protocol Timer;
+
+configuration DrawThingMLJava2D 
+@add_c_libraries "SDL2"
+{
+	
+	instance bb : DrawThingML
+	instance disp : Java2DDisplay
+	
+	//connector bb.clock over Timer
+	connector bb.display => disp.display
+	
+}

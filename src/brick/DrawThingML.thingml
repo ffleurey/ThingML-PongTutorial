@@ -11,13 +11,13 @@ thing DrawThingML includes DisplayMsgs {
 	readonly property XDISPSIZE : UInt8 = 160
 	readonly property YDISPSIZE : UInt8 = 128
 	
-	function drawThingML(x : Int16, y : Int16) do
+	function drawThingML(px : Int16, py : Int16) do
 		
 		display!setColor(255,255,255) // WHITE
-		display!fillRect(x,y,108, 13)
+		display!fillRect(px,py,108, 13)
 	
-		x = x+1
-		y = y+1
+		var x : Int16 = px+1
+		var y : Int16 = py+1
 	
 		display!setColor(80,80,80) // GREY
 		// T
