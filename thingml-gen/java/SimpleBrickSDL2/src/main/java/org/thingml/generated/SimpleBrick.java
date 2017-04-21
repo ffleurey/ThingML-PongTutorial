@@ -166,54 +166,54 @@ client.update_from_display();
 }}
 
 //Attributes
-private int SimpleBrick_padx_var;
-private final int SimpleBrick_BRICK_HEIGHT_var;
-private int SimpleBrick_LEFT_var;
-private int SimpleBrick_RIGHT_var;
-private final int SimpleBrick_YMAX_var;
-private int SimpleBrick_pady_var;
-private final int SimpleBrick_SCALE_var;
-private int SimpleBrick_dy_var;
-private int SimpleBrick_by_var;
-private int SimpleBrick_prevPY_var;
-private final int SimpleBrick_XMAX_var;
-private int SimpleBrick_dx_var;
 private final int SimpleBrick_YDISPSIZE_var;
-private int SimpleBrick_prevBX_var;
-private int SimpleBrick_br_var;
-private int SimpleBrick_padlen_var;
-private int[] SimpleBrick_bricks_var;
-private final int SimpleBrick_XDISPSIZE_var;
-private int SimpleBrick_bx_var;
-private int SimpleBrick_prevPX_var;
-private int SimpleBrick_TOP_var;
-private int SimpleBrick_prevBY_var;
-private final int SimpleBrick_BRICK_ROWS_var;
 private int SimpleBrick_BOTTOM_var;
-private int debug_SimpleBrick_padx_var;
-private int debug_SimpleBrick_BRICK_HEIGHT_var;
-private int debug_SimpleBrick_LEFT_var;
-private int debug_SimpleBrick_RIGHT_var;
-private int debug_SimpleBrick_YMAX_var;
-private int debug_SimpleBrick_pady_var;
-private int debug_SimpleBrick_SCALE_var;
-private int debug_SimpleBrick_dy_var;
-private int debug_SimpleBrick_by_var;
-private int debug_SimpleBrick_prevPY_var;
-private int debug_SimpleBrick_XMAX_var;
-private int debug_SimpleBrick_dx_var;
+private int SimpleBrick_by_var;
+private final int SimpleBrick_YMAX_var;
+private final int SimpleBrick_BRICK_HEIGHT_var;
+private int SimpleBrick_padx_var;
+private int SimpleBrick_LEFT_var;
+private int SimpleBrick_bx_var;
+private int SimpleBrick_dx_var;
+private int SimpleBrick_prevBY_var;
+private final int SimpleBrick_XDISPSIZE_var;
+private int SimpleBrick_padlen_var;
+private int SimpleBrick_RIGHT_var;
+private int SimpleBrick_prevBX_var;
+private int[] SimpleBrick_bricks_var;
+private final int SimpleBrick_XMAX_var;
+private final int SimpleBrick_BRICK_ROWS_var;
+private int SimpleBrick_prevPX_var;
+private int SimpleBrick_prevPY_var;
+private int SimpleBrick_br_var;
+private final int SimpleBrick_SCALE_var;
+private int SimpleBrick_pady_var;
+private int SimpleBrick_TOP_var;
+private int SimpleBrick_dy_var;
 private int debug_SimpleBrick_YDISPSIZE_var;
-private int debug_SimpleBrick_prevBX_var;
-private int debug_SimpleBrick_br_var;
-private int debug_SimpleBrick_padlen_var;
-private int[] debug_SimpleBrick_bricks_var;
-private int debug_SimpleBrick_XDISPSIZE_var;
-private int debug_SimpleBrick_bx_var;
-private int debug_SimpleBrick_prevPX_var;
-private int debug_SimpleBrick_TOP_var;
-private int debug_SimpleBrick_prevBY_var;
-private int debug_SimpleBrick_BRICK_ROWS_var;
 private int debug_SimpleBrick_BOTTOM_var;
+private int debug_SimpleBrick_by_var;
+private int debug_SimpleBrick_YMAX_var;
+private int debug_SimpleBrick_BRICK_HEIGHT_var;
+private int debug_SimpleBrick_padx_var;
+private int debug_SimpleBrick_LEFT_var;
+private int debug_SimpleBrick_bx_var;
+private int debug_SimpleBrick_dx_var;
+private int debug_SimpleBrick_prevBY_var;
+private int debug_SimpleBrick_XDISPSIZE_var;
+private int debug_SimpleBrick_padlen_var;
+private int debug_SimpleBrick_RIGHT_var;
+private int debug_SimpleBrick_prevBX_var;
+private int[] debug_SimpleBrick_bricks_var;
+private int debug_SimpleBrick_XMAX_var;
+private int debug_SimpleBrick_BRICK_ROWS_var;
+private int debug_SimpleBrick_prevPX_var;
+private int debug_SimpleBrick_prevPY_var;
+private int debug_SimpleBrick_br_var;
+private int debug_SimpleBrick_SCALE_var;
+private int debug_SimpleBrick_pady_var;
+private int debug_SimpleBrick_TOP_var;
+private int debug_SimpleBrick_dy_var;
 //Ports
 private Port clock_port;
 private Port display_port;
@@ -279,6 +279,11 @@ public DisplayErrorMessageType getDisplayErrorType(){
 return displayErrorType;
 }
 
+protected final VelocityMessageType velocityType = new VelocityMessageType();
+public VelocityMessageType getVelocityType(){
+return velocityType;
+}
+
 protected final PositionMessageType positionType = new PositionMessageType();
 public PositionMessageType getPositionType(){
 return positionType;
@@ -292,123 +297,83 @@ return fireType;
 //Empty Constructor
 public SimpleBrick() {
 super();
-SimpleBrick_padx_var = (int) getSimpleBrick_YMAX_var() / 2;
-SimpleBrick_BRICK_HEIGHT_var = (int) 9;
-SimpleBrick_LEFT_var = (int) 2 * getSimpleBrick_SCALE_var();
-SimpleBrick_RIGHT_var = (int) getSimpleBrick_XMAX_var() - 2 * getSimpleBrick_SCALE_var();
-SimpleBrick_YMAX_var = (int) getSimpleBrick_YDISPSIZE_var() * getSimpleBrick_SCALE_var();
-SimpleBrick_pady_var = (int) getSimpleBrick_YMAX_var() - 6 * getSimpleBrick_SCALE_var();
-SimpleBrick_SCALE_var = (int) 64;
-SimpleBrick_dy_var = (int) getSimpleBrick_XMAX_var() / 65;
-SimpleBrick_by_var = (int) getSimpleBrick_YMAX_var() / 2;
-SimpleBrick_prevPY_var = (int)  -1;
-SimpleBrick_XMAX_var = (int) getSimpleBrick_XDISPSIZE_var() * getSimpleBrick_SCALE_var();
-SimpleBrick_dx_var = (int) getSimpleBrick_XMAX_var() / 98;
 SimpleBrick_YDISPSIZE_var = (int) 128;
-SimpleBrick_prevBX_var = (int)  -1;
-SimpleBrick_br_var = (int) 3 * getSimpleBrick_SCALE_var();
-SimpleBrick_padlen_var = (int) getSimpleBrick_XMAX_var() / 6;
-SimpleBrick_XDISPSIZE_var = (int) 160;
-SimpleBrick_bx_var = (int) getSimpleBrick_XMAX_var() / 2;
-SimpleBrick_prevPX_var = (int)  -1;
-SimpleBrick_TOP_var = (int) 12 * getSimpleBrick_SCALE_var();
-SimpleBrick_prevBY_var = (int)  -1;
-SimpleBrick_BRICK_ROWS_var = (int) 5;
 SimpleBrick_BOTTOM_var = (int) getSimpleBrick_YMAX_var() + 8 * getSimpleBrick_SCALE_var();
+SimpleBrick_by_var = (int) getSimpleBrick_YMAX_var() / 2;
+SimpleBrick_YMAX_var = (int) getSimpleBrick_YDISPSIZE_var() * getSimpleBrick_SCALE_var();
+SimpleBrick_BRICK_HEIGHT_var = (int) 9;
+SimpleBrick_padx_var = (int) getSimpleBrick_YMAX_var() / 2;
+SimpleBrick_LEFT_var = (int) 2 * getSimpleBrick_SCALE_var();
+SimpleBrick_bx_var = (int) getSimpleBrick_XMAX_var() / 2;
+SimpleBrick_dx_var = (int) getSimpleBrick_XMAX_var() / 98;
+SimpleBrick_prevBY_var = (int)  -1;
+SimpleBrick_XDISPSIZE_var = (int) 160;
+SimpleBrick_padlen_var = (int) getSimpleBrick_XMAX_var() / 6;
+SimpleBrick_RIGHT_var = (int) getSimpleBrick_XMAX_var() - 2 * getSimpleBrick_SCALE_var();
+SimpleBrick_prevBX_var = (int)  -1;
+SimpleBrick_XMAX_var = (int) getSimpleBrick_XDISPSIZE_var() * getSimpleBrick_SCALE_var();
+SimpleBrick_BRICK_ROWS_var = (int) 5;
+SimpleBrick_prevPX_var = (int)  -1;
+SimpleBrick_prevPY_var = (int)  -1;
+SimpleBrick_br_var = (int) 3 * getSimpleBrick_SCALE_var();
+SimpleBrick_SCALE_var = (int) 64;
+SimpleBrick_pady_var = (int) getSimpleBrick_YMAX_var() - 6 * getSimpleBrick_SCALE_var();
+SimpleBrick_TOP_var = (int) 12 * getSimpleBrick_SCALE_var();
+SimpleBrick_dy_var = (int) getSimpleBrick_XMAX_var() / 65;
 }
 
 //Constructor (only readonly (final) attributes)
-public SimpleBrick(final int SimpleBrick_BRICK_HEIGHT_var, final int SimpleBrick_YMAX_var, final int SimpleBrick_SCALE_var, final int SimpleBrick_XMAX_var, final int SimpleBrick_YDISPSIZE_var, final int SimpleBrick_XDISPSIZE_var, final int SimpleBrick_BRICK_ROWS_var) {
+public SimpleBrick(final int SimpleBrick_YDISPSIZE_var, final int SimpleBrick_YMAX_var, final int SimpleBrick_BRICK_HEIGHT_var, final int SimpleBrick_XDISPSIZE_var, final int SimpleBrick_XMAX_var, final int SimpleBrick_BRICK_ROWS_var, final int SimpleBrick_SCALE_var) {
 super();
-this.SimpleBrick_BRICK_HEIGHT_var = SimpleBrick_BRICK_HEIGHT_var;
-this.SimpleBrick_YMAX_var = SimpleBrick_YMAX_var;
-this.SimpleBrick_SCALE_var = SimpleBrick_SCALE_var;
-this.SimpleBrick_XMAX_var = SimpleBrick_XMAX_var;
 this.SimpleBrick_YDISPSIZE_var = SimpleBrick_YDISPSIZE_var;
+this.SimpleBrick_YMAX_var = SimpleBrick_YMAX_var;
+this.SimpleBrick_BRICK_HEIGHT_var = SimpleBrick_BRICK_HEIGHT_var;
 this.SimpleBrick_XDISPSIZE_var = SimpleBrick_XDISPSIZE_var;
+this.SimpleBrick_XMAX_var = SimpleBrick_XMAX_var;
 this.SimpleBrick_BRICK_ROWS_var = SimpleBrick_BRICK_ROWS_var;
+this.SimpleBrick_SCALE_var = SimpleBrick_SCALE_var;
 }
 
 //Constructor (all attributes)
-public SimpleBrick(String name, final int SimpleBrick_padx_var, final int SimpleBrick_BRICK_HEIGHT_var, final int SimpleBrick_LEFT_var, final int SimpleBrick_RIGHT_var, final int SimpleBrick_YMAX_var, final int SimpleBrick_pady_var, final int SimpleBrick_SCALE_var, final int SimpleBrick_dy_var, final int SimpleBrick_by_var, final int SimpleBrick_prevPY_var, final int SimpleBrick_XMAX_var, final int SimpleBrick_dx_var, final int SimpleBrick_YDISPSIZE_var, final int SimpleBrick_prevBX_var, final int SimpleBrick_br_var, final int SimpleBrick_padlen_var, final int[] SimpleBrick_bricks_var, final int SimpleBrick_XDISPSIZE_var, final int SimpleBrick_bx_var, final int SimpleBrick_prevPX_var, final int SimpleBrick_TOP_var, final int SimpleBrick_prevBY_var, final int SimpleBrick_BRICK_ROWS_var, final int SimpleBrick_BOTTOM_var) {
+public SimpleBrick(String name, final int SimpleBrick_YDISPSIZE_var, final int SimpleBrick_BOTTOM_var, final int SimpleBrick_by_var, final int SimpleBrick_YMAX_var, final int SimpleBrick_BRICK_HEIGHT_var, final int SimpleBrick_padx_var, final int SimpleBrick_LEFT_var, final int SimpleBrick_bx_var, final int SimpleBrick_dx_var, final int SimpleBrick_prevBY_var, final int SimpleBrick_XDISPSIZE_var, final int SimpleBrick_padlen_var, final int SimpleBrick_RIGHT_var, final int SimpleBrick_prevBX_var, final int[] SimpleBrick_bricks_var, final int SimpleBrick_XMAX_var, final int SimpleBrick_BRICK_ROWS_var, final int SimpleBrick_prevPX_var, final int SimpleBrick_prevPY_var, final int SimpleBrick_br_var, final int SimpleBrick_SCALE_var, final int SimpleBrick_pady_var, final int SimpleBrick_TOP_var, final int SimpleBrick_dy_var) {
 super(name);
-this.SimpleBrick_padx_var = SimpleBrick_padx_var;
-this.SimpleBrick_BRICK_HEIGHT_var = SimpleBrick_BRICK_HEIGHT_var;
-this.SimpleBrick_LEFT_var = SimpleBrick_LEFT_var;
-this.SimpleBrick_RIGHT_var = SimpleBrick_RIGHT_var;
-this.SimpleBrick_YMAX_var = SimpleBrick_YMAX_var;
-this.SimpleBrick_pady_var = SimpleBrick_pady_var;
-this.SimpleBrick_SCALE_var = SimpleBrick_SCALE_var;
-this.SimpleBrick_dy_var = SimpleBrick_dy_var;
-this.SimpleBrick_by_var = SimpleBrick_by_var;
-this.SimpleBrick_prevPY_var = SimpleBrick_prevPY_var;
-this.SimpleBrick_XMAX_var = SimpleBrick_XMAX_var;
-this.SimpleBrick_dx_var = SimpleBrick_dx_var;
 this.SimpleBrick_YDISPSIZE_var = SimpleBrick_YDISPSIZE_var;
-this.SimpleBrick_prevBX_var = SimpleBrick_prevBX_var;
-this.SimpleBrick_br_var = SimpleBrick_br_var;
-this.SimpleBrick_padlen_var = SimpleBrick_padlen_var;
-this.SimpleBrick_bricks_var = SimpleBrick_bricks_var;
-this.SimpleBrick_XDISPSIZE_var = SimpleBrick_XDISPSIZE_var;
-this.SimpleBrick_bx_var = SimpleBrick_bx_var;
-this.SimpleBrick_prevPX_var = SimpleBrick_prevPX_var;
-this.SimpleBrick_TOP_var = SimpleBrick_TOP_var;
-this.SimpleBrick_prevBY_var = SimpleBrick_prevBY_var;
-this.SimpleBrick_BRICK_ROWS_var = SimpleBrick_BRICK_ROWS_var;
 this.SimpleBrick_BOTTOM_var = SimpleBrick_BOTTOM_var;
+this.SimpleBrick_by_var = SimpleBrick_by_var;
+this.SimpleBrick_YMAX_var = SimpleBrick_YMAX_var;
+this.SimpleBrick_BRICK_HEIGHT_var = SimpleBrick_BRICK_HEIGHT_var;
+this.SimpleBrick_padx_var = SimpleBrick_padx_var;
+this.SimpleBrick_LEFT_var = SimpleBrick_LEFT_var;
+this.SimpleBrick_bx_var = SimpleBrick_bx_var;
+this.SimpleBrick_dx_var = SimpleBrick_dx_var;
+this.SimpleBrick_prevBY_var = SimpleBrick_prevBY_var;
+this.SimpleBrick_XDISPSIZE_var = SimpleBrick_XDISPSIZE_var;
+this.SimpleBrick_padlen_var = SimpleBrick_padlen_var;
+this.SimpleBrick_RIGHT_var = SimpleBrick_RIGHT_var;
+this.SimpleBrick_prevBX_var = SimpleBrick_prevBX_var;
+this.SimpleBrick_bricks_var = SimpleBrick_bricks_var;
+this.SimpleBrick_XMAX_var = SimpleBrick_XMAX_var;
+this.SimpleBrick_BRICK_ROWS_var = SimpleBrick_BRICK_ROWS_var;
+this.SimpleBrick_prevPX_var = SimpleBrick_prevPX_var;
+this.SimpleBrick_prevPY_var = SimpleBrick_prevPY_var;
+this.SimpleBrick_br_var = SimpleBrick_br_var;
+this.SimpleBrick_SCALE_var = SimpleBrick_SCALE_var;
+this.SimpleBrick_pady_var = SimpleBrick_pady_var;
+this.SimpleBrick_TOP_var = SimpleBrick_TOP_var;
+this.SimpleBrick_dy_var = SimpleBrick_dy_var;
 }
 
 //Getters and Setters for non readonly/final attributes
-public int getSimpleBrick_padx_var() {
-return SimpleBrick_padx_var;
+public int getSimpleBrick_YDISPSIZE_var() {
+return SimpleBrick_YDISPSIZE_var;
 }
 
-public void setSimpleBrick_padx_var(int SimpleBrick_padx_var) {
-this.SimpleBrick_padx_var = SimpleBrick_padx_var;
+public int getSimpleBrick_BOTTOM_var() {
+return SimpleBrick_BOTTOM_var;
 }
 
-public int getSimpleBrick_BRICK_HEIGHT_var() {
-return SimpleBrick_BRICK_HEIGHT_var;
-}
-
-public int getSimpleBrick_LEFT_var() {
-return SimpleBrick_LEFT_var;
-}
-
-public void setSimpleBrick_LEFT_var(int SimpleBrick_LEFT_var) {
-this.SimpleBrick_LEFT_var = SimpleBrick_LEFT_var;
-}
-
-public int getSimpleBrick_RIGHT_var() {
-return SimpleBrick_RIGHT_var;
-}
-
-public void setSimpleBrick_RIGHT_var(int SimpleBrick_RIGHT_var) {
-this.SimpleBrick_RIGHT_var = SimpleBrick_RIGHT_var;
-}
-
-public int getSimpleBrick_YMAX_var() {
-return SimpleBrick_YMAX_var;
-}
-
-public int getSimpleBrick_pady_var() {
-return SimpleBrick_pady_var;
-}
-
-public void setSimpleBrick_pady_var(int SimpleBrick_pady_var) {
-this.SimpleBrick_pady_var = SimpleBrick_pady_var;
-}
-
-public int getSimpleBrick_SCALE_var() {
-return SimpleBrick_SCALE_var;
-}
-
-public int getSimpleBrick_dy_var() {
-return SimpleBrick_dy_var;
-}
-
-public void setSimpleBrick_dy_var(int SimpleBrick_dy_var) {
-this.SimpleBrick_dy_var = SimpleBrick_dy_var;
+public void setSimpleBrick_BOTTOM_var(int SimpleBrick_BOTTOM_var) {
+this.SimpleBrick_BOTTOM_var = SimpleBrick_BOTTOM_var;
 }
 
 public int getSimpleBrick_by_var() {
@@ -419,64 +384,28 @@ public void setSimpleBrick_by_var(int SimpleBrick_by_var) {
 this.SimpleBrick_by_var = SimpleBrick_by_var;
 }
 
-public int getSimpleBrick_prevPY_var() {
-return SimpleBrick_prevPY_var;
+public int getSimpleBrick_YMAX_var() {
+return SimpleBrick_YMAX_var;
 }
 
-public void setSimpleBrick_prevPY_var(int SimpleBrick_prevPY_var) {
-this.SimpleBrick_prevPY_var = SimpleBrick_prevPY_var;
+public int getSimpleBrick_BRICK_HEIGHT_var() {
+return SimpleBrick_BRICK_HEIGHT_var;
 }
 
-public int getSimpleBrick_XMAX_var() {
-return SimpleBrick_XMAX_var;
+public int getSimpleBrick_padx_var() {
+return SimpleBrick_padx_var;
 }
 
-public int getSimpleBrick_dx_var() {
-return SimpleBrick_dx_var;
+public void setSimpleBrick_padx_var(int SimpleBrick_padx_var) {
+this.SimpleBrick_padx_var = SimpleBrick_padx_var;
 }
 
-public void setSimpleBrick_dx_var(int SimpleBrick_dx_var) {
-this.SimpleBrick_dx_var = SimpleBrick_dx_var;
+public int getSimpleBrick_LEFT_var() {
+return SimpleBrick_LEFT_var;
 }
 
-public int getSimpleBrick_YDISPSIZE_var() {
-return SimpleBrick_YDISPSIZE_var;
-}
-
-public int getSimpleBrick_prevBX_var() {
-return SimpleBrick_prevBX_var;
-}
-
-public void setSimpleBrick_prevBX_var(int SimpleBrick_prevBX_var) {
-this.SimpleBrick_prevBX_var = SimpleBrick_prevBX_var;
-}
-
-public int getSimpleBrick_br_var() {
-return SimpleBrick_br_var;
-}
-
-public void setSimpleBrick_br_var(int SimpleBrick_br_var) {
-this.SimpleBrick_br_var = SimpleBrick_br_var;
-}
-
-public int getSimpleBrick_padlen_var() {
-return SimpleBrick_padlen_var;
-}
-
-public void setSimpleBrick_padlen_var(int SimpleBrick_padlen_var) {
-this.SimpleBrick_padlen_var = SimpleBrick_padlen_var;
-}
-
-public int[] getSimpleBrick_bricks_var() {
-return SimpleBrick_bricks_var;
-}
-
-public void setSimpleBrick_bricks_var(int[] SimpleBrick_bricks_var) {
-this.SimpleBrick_bricks_var = SimpleBrick_bricks_var;
-}
-
-public int getSimpleBrick_XDISPSIZE_var() {
-return SimpleBrick_XDISPSIZE_var;
+public void setSimpleBrick_LEFT_var(int SimpleBrick_LEFT_var) {
+this.SimpleBrick_LEFT_var = SimpleBrick_LEFT_var;
 }
 
 public int getSimpleBrick_bx_var() {
@@ -487,20 +416,12 @@ public void setSimpleBrick_bx_var(int SimpleBrick_bx_var) {
 this.SimpleBrick_bx_var = SimpleBrick_bx_var;
 }
 
-public int getSimpleBrick_prevPX_var() {
-return SimpleBrick_prevPX_var;
+public int getSimpleBrick_dx_var() {
+return SimpleBrick_dx_var;
 }
 
-public void setSimpleBrick_prevPX_var(int SimpleBrick_prevPX_var) {
-this.SimpleBrick_prevPX_var = SimpleBrick_prevPX_var;
-}
-
-public int getSimpleBrick_TOP_var() {
-return SimpleBrick_TOP_var;
-}
-
-public void setSimpleBrick_TOP_var(int SimpleBrick_TOP_var) {
-this.SimpleBrick_TOP_var = SimpleBrick_TOP_var;
+public void setSimpleBrick_dx_var(int SimpleBrick_dx_var) {
+this.SimpleBrick_dx_var = SimpleBrick_dx_var;
 }
 
 public int getSimpleBrick_prevBY_var() {
@@ -511,16 +432,100 @@ public void setSimpleBrick_prevBY_var(int SimpleBrick_prevBY_var) {
 this.SimpleBrick_prevBY_var = SimpleBrick_prevBY_var;
 }
 
+public int getSimpleBrick_XDISPSIZE_var() {
+return SimpleBrick_XDISPSIZE_var;
+}
+
+public int getSimpleBrick_padlen_var() {
+return SimpleBrick_padlen_var;
+}
+
+public void setSimpleBrick_padlen_var(int SimpleBrick_padlen_var) {
+this.SimpleBrick_padlen_var = SimpleBrick_padlen_var;
+}
+
+public int getSimpleBrick_RIGHT_var() {
+return SimpleBrick_RIGHT_var;
+}
+
+public void setSimpleBrick_RIGHT_var(int SimpleBrick_RIGHT_var) {
+this.SimpleBrick_RIGHT_var = SimpleBrick_RIGHT_var;
+}
+
+public int getSimpleBrick_prevBX_var() {
+return SimpleBrick_prevBX_var;
+}
+
+public void setSimpleBrick_prevBX_var(int SimpleBrick_prevBX_var) {
+this.SimpleBrick_prevBX_var = SimpleBrick_prevBX_var;
+}
+
+public int[] getSimpleBrick_bricks_var() {
+return SimpleBrick_bricks_var;
+}
+
+public void setSimpleBrick_bricks_var(int[] SimpleBrick_bricks_var) {
+this.SimpleBrick_bricks_var = SimpleBrick_bricks_var;
+}
+
+public int getSimpleBrick_XMAX_var() {
+return SimpleBrick_XMAX_var;
+}
+
 public int getSimpleBrick_BRICK_ROWS_var() {
 return SimpleBrick_BRICK_ROWS_var;
 }
 
-public int getSimpleBrick_BOTTOM_var() {
-return SimpleBrick_BOTTOM_var;
+public int getSimpleBrick_prevPX_var() {
+return SimpleBrick_prevPX_var;
 }
 
-public void setSimpleBrick_BOTTOM_var(int SimpleBrick_BOTTOM_var) {
-this.SimpleBrick_BOTTOM_var = SimpleBrick_BOTTOM_var;
+public void setSimpleBrick_prevPX_var(int SimpleBrick_prevPX_var) {
+this.SimpleBrick_prevPX_var = SimpleBrick_prevPX_var;
+}
+
+public int getSimpleBrick_prevPY_var() {
+return SimpleBrick_prevPY_var;
+}
+
+public void setSimpleBrick_prevPY_var(int SimpleBrick_prevPY_var) {
+this.SimpleBrick_prevPY_var = SimpleBrick_prevPY_var;
+}
+
+public int getSimpleBrick_br_var() {
+return SimpleBrick_br_var;
+}
+
+public void setSimpleBrick_br_var(int SimpleBrick_br_var) {
+this.SimpleBrick_br_var = SimpleBrick_br_var;
+}
+
+public int getSimpleBrick_SCALE_var() {
+return SimpleBrick_SCALE_var;
+}
+
+public int getSimpleBrick_pady_var() {
+return SimpleBrick_pady_var;
+}
+
+public void setSimpleBrick_pady_var(int SimpleBrick_pady_var) {
+this.SimpleBrick_pady_var = SimpleBrick_pady_var;
+}
+
+public int getSimpleBrick_TOP_var() {
+return SimpleBrick_TOP_var;
+}
+
+public void setSimpleBrick_TOP_var(int SimpleBrick_TOP_var) {
+this.SimpleBrick_TOP_var = SimpleBrick_TOP_var;
+}
+
+public int getSimpleBrick_dy_var() {
+return SimpleBrick_dy_var;
+}
+
+public void setSimpleBrick_dy_var(int SimpleBrick_dy_var) {
+this.SimpleBrick_dy_var = SimpleBrick_dy_var;
 }
 
 //Getters for Ports
@@ -555,7 +560,7 @@ sendTimer_start_via_clock((int) (0), (int) (33));
 states_SimpleBrick_SC.add(state_SimpleBrick_SC_PLAY);
 final List<Region> regions_SimpleBrick_SC = new ArrayList<Region>();
 final List<Handler> transitions_SimpleBrick_SC = new ArrayList<Handler>();
-transitions_SimpleBrick_SC.add(new Transition("1362387393",displayReadyType, display_port, state_SimpleBrick_SC_INIT, state_SimpleBrick_SC_PLAY){
+transitions_SimpleBrick_SC.add(new Transition("1341912487",displayReadyType, display_port, state_SimpleBrick_SC_INIT, state_SimpleBrick_SC_PLAY){
 @Override
 public void doExecute(final Event e) {
 sendClear_via_display();
@@ -564,7 +569,7 @@ createBricks();
 }
 
 });
-transitions_SimpleBrick_SC.add(new InternalTransition("92188815",positionType, controller_port, state_SimpleBrick_SC_PLAY){
+transitions_SimpleBrick_SC.add(new InternalTransition("695551500",positionType, controller_port, state_SimpleBrick_SC_PLAY){
 @Override
 public void doExecute(final Event e) {
 final PositionMessageType.PositionMessage position = (PositionMessageType.PositionMessage) e;
@@ -574,7 +579,7 @@ SimpleBrick_padx_var = (int) (getSimpleBrick_LEFT_var() + center_var + (position
 }
 
 });
-transitions_SimpleBrick_SC.add(new Transition("843053556",timer_timeoutType, clock_port, state_SimpleBrick_SC_PLAY, state_SimpleBrick_SC_PLAY){
+transitions_SimpleBrick_SC.add(new Transition("464053036",timer_timeoutType, clock_port, state_SimpleBrick_SC_PLAY, state_SimpleBrick_SC_PLAY){
 @Override
 public boolean doCheck(final Event e) {
 final Timer_timeoutMessageType.Timer_timeoutMessage timer_timeout = (Timer_timeoutMessageType.Timer_timeoutMessage) e;

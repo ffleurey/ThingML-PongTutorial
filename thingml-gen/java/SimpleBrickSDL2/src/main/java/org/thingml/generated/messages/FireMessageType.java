@@ -22,24 +22,26 @@ public FireMessageType() {
 super("fire", (short) 0);
 }
 
-public Event instantiate() { return new FireMessage(this); }
+public Event instantiate(final int id) { return new FireMessage(this, id); }
 @Override
-public Event instantiate(Map<String, Object> params) {return instantiate();
+public Event instantiate(Map<String, Object> params) {return instantiate((Integer) params.get("id"));
 }
 
 public class FireMessage extends Event implements java.io.Serializable {
 
+public final int id;
 @Override
 public String toString(){
-return "fire (" + ")";
+return "fire (" + "id: " + id + ")";
 }
 
-protected FireMessage(EventType type) {
+protected FireMessage(EventType type, final int id) {
 super(type);
+this.id = id;
 }
 @Override
 public Event clone() {
-return instantiate();
+return instantiate(this.id);
 }}
 
 }

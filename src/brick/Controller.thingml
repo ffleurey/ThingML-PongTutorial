@@ -2,8 +2,9 @@ import "_Timer.thingml"
 
 thing fragment ControllerMsgs {
 	
+	message velocity(dx : Int16, dy : Int16)
 	message position(x : Int16, y : Int16)
-	message fire()
+	message fire(id : UInt8)
 	
 }
 
@@ -11,6 +12,87 @@ thing fragment Controller includes ControllerMsgs {
 	
 	provided port controls {
 		sends position, fire
+	}	
+}
+
+thing fragment TimerController includes Controller, TimerMsgs {
+	
+	required port clock {
+		sends timer_start, timer_cancel
+		receives timer_timeout
 	}
 	
+	readonly property XMAX : Int16 = 100
+	readonly property YMAX : Int16 = 100
+	readonly property XMIN : Int16 = -100
+	readonly property YMIN : Int16 = -100
+	
+	property posX : Int16 = 0
+	property posY : Int16 = 0
+	
+	property dx : Int16 = 0
+	property dy : Int16 = 0
+}
+
+thing VelocityController includes TimerController {
+	
+	readonly property timerID : UInt8 = 4 // Make sure to use a timer which is not already used!
+	
+	required port ctrl_in {
+		receives velocity, fire
+	}
+
+	statechart SC init Running {
+		
+		internal event e:ctrl_in?fire action controls!fire(e.id)
+		internal event e:ctrl_in?velocity action do 
+			dx = e.dx
+			dy = e.dy
+		end
+		
+		state Running {
+			on entry clock!timer_start(timerID, 50)
+			
+			transition -> Running event e : clock?timer_timeout guard e.id == timerID
+			action do
+				posX = posX + dx
+				posY = posY + dy
+				
+				if (posX < XMIN) posX = XMIN
+				else if (posX > XMAX) posX = XMAX
+				
+				if (posY < YMIN) posY=YMIN
+				else if (posY > YMAX) 	posY=YMAX
+				
+				controls!position(posX, posY)
+			end	
+		}
+	}
+}
+
+
+thing DummyController includes TimerController {
+	
+	readonly property timerID : UInt8 = 3 // Make sure to use a timer which is not already used!
+	
+	statechart SC init Bouncing {
+		
+		state Bouncing {
+			on entry clock!timer_start(timerID, 50)
+			
+			transition -> Bouncing event e : clock?timer_timeout guard e.id == timerID
+			action do
+				posX = posX + dx
+				posY = posY + dy
+				
+				if (posX < XMIN) 		do 	posX = 2*XMIN-posX		dx = -dx	end
+				else if (posX > XMAX) 	do 	posX = 2*XMAX-posX		dx = -dx	end
+				
+				if (posY < YMIN) 		do 	posY = 2*YMIN-posY		dy = -dy	end
+				else if (posY > YMAX) 	do 	posY = 2*YMAX-posY		dy = -dy	end
+				
+				controls!position(posX, posY)
+			end	
+		}
+	}
 }

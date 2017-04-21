@@ -1,13 +1,12 @@
-c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\IDummyController_controlsClient.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\FillRectMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\FireMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\SetColorMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\Timer_startMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\Java2DDisplay.java
-c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\IDummyController_clockClient.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\CreateMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\PositionMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\IJava2DDisplay_display.java
+c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\IVelocityController_ctrl_in.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\ISimpleBrick_clockClient.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\DestroyMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\AttributeListener.java
@@ -15,7 +14,9 @@ c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\SimpleBrick.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\ITimerJava_timer.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\ClearMessageType.java
+c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\IJava2DDisplay_vctrlClient.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\Timer_cancelMessageType.java
+c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\IVelocityController_controlsClient.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\ISimpleBrick_controller.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\DisplayReadyMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\ISimpleBrick_displayClient.java
@@ -27,6 +28,8 @@ c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\Timer_timeoutMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\ISimpleBrick_clock.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\ITimerJava_timerClient.java
-c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\DummyController.java
+c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\IVelocityController_clock.java
+c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\VelocityController.java
+c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\IVelocityController_clockClient.java
+c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\messages\VelocityMessageType.java
 c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\TimerJava.java
-c:\home\checkouts\ThingML-PongTutorial\thingml-gen\java\SimpleBrickSDL2\src\main\java\org\thingml\generated\api\IDummyController_clock.java

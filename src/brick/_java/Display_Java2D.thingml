@@ -1,7 +1,8 @@
 import "../Display.thingml"
 import "../Controller.thingml"
 
-thing Java2DDisplay includes Display
+thing Java2DDisplay includes Display, ControllerMsgs 
+	
 @java_import "
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,8 +10,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;"
+import javax.swing.*;
+import java.awt.event.*;"
 
 @java_features "
 	protected JPanel canevas;
@@ -29,11 +30,16 @@ import javax.swing.JPanel;"
 		}
 	}"
 {
+	
 	readonly property SCALE 	: UInt8 = 5
-	//property xctrl : Int16 = 0
 	
 	property XFRAMESIZE : UInt16
 	property YFRAMESIZE : UInt16
+	
+	
+	provided port vctrl {
+		sends fire, velocity
+	}
 	
 	function initDisplay(xsize : UInt8, ysize : UInt8) do
 		XFRAMESIZE = xsize
@@ -69,6 +75,41 @@ import javax.swing.JPanel;"
         frame.add(canevas);
         frame.pack();
         frame.setResizable(false);
+        
+        canevas.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {}
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            	int keyCode = e.getKeyCode();
+			    switch( keyCode ) { 
+			        case KeyEvent.VK_LEFT:
+			            'vctrl!velocity(0,0)'
+			            break;
+			        case KeyEvent.VK_RIGHT :
+			            'vctrl!velocity(0,0)'
+			            break;
+			     }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int keyCode = e.getKeyCode();
+			    switch( keyCode ) { 
+			        case KeyEvent.VK_LEFT:
+			            'vctrl!velocity(-8,0)'
+			            break;
+			        case KeyEvent.VK_RIGHT :
+			            'vctrl!velocity(8,0)'
+			            break;
+			     }
+            }
+        });
+        canevas.setFocusable(true);
+        canevas.requestFocusInWindow();
+        
         frame.setVisible(true);
         
         canevas.repaint();'

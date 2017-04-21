@@ -23,8 +23,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.event.*;
 
 //END: @java_import annotation
 
@@ -76,6 +76,15 @@ result += "";
 return result;
 }
 
+private Collection<IJava2DDisplay_vctrlClient> vctrl_clients = Collections.synchronizedCollection(new LinkedList<IJava2DDisplay_vctrlClient>());
+public synchronized void registerOnVctrl(IJava2DDisplay_vctrlClient client){
+vctrl_clients.add(client);
+}
+
+public synchronized void unregisterFromVctrl(IJava2DDisplay_vctrlClient client){
+vctrl_clients.remove(client);
+}
+
 private Collection<IJava2DDisplay_displayClient> display_clients = Collections.synchronizedCollection(new LinkedList<IJava2DDisplay_displayClient>());
 public synchronized void registerOnDisplay(IJava2DDisplay_displayClient client){
 display_clients.add(client);
@@ -120,6 +129,22 @@ public synchronized void fillRect_via_display(int DisplayMsgs_fillRect_x_var, in
 receive(fillRectType.instantiate(DisplayMsgs_fillRect_x_var, DisplayMsgs_fillRect_y_var, DisplayMsgs_fillRect_width_var, DisplayMsgs_fillRect_height_var), display_port);
 }
 
+private void sendFire_via_vctrl(int ControllerMsgs_fire_id_var){
+//ThingML send
+vctrl_port.send(fireType.instantiate(ControllerMsgs_fire_id_var));
+//send to other clients
+for(IJava2DDisplay_vctrlClient client : vctrl_clients){
+client.fire_from_vctrl(ControllerMsgs_fire_id_var);
+}}
+
+private void sendVelocity_via_vctrl(int ControllerMsgs_velocity_dx_var, int ControllerMsgs_velocity_dy_var){
+//ThingML send
+vctrl_port.send(velocityType.instantiate(ControllerMsgs_velocity_dx_var, ControllerMsgs_velocity_dy_var));
+//send to other clients
+for(IJava2DDisplay_vctrlClient client : vctrl_clients){
+client.velocity_from_vctrl(ControllerMsgs_velocity_dx_var, ControllerMsgs_velocity_dy_var);
+}}
+
 private void sendDisplayReady_via_display(){
 //ThingML send
 display_port.send(displayReadyType.instantiate());
@@ -138,12 +163,13 @@ client.displayError_from_display();
 
 //Attributes
 private final int Java2DDisplay_SCALE_var;
-private int Java2DDisplay_XFRAMESIZE_var;
 private int Java2DDisplay_YFRAMESIZE_var;
+private int Java2DDisplay_XFRAMESIZE_var;
 private int debug_Java2DDisplay_SCALE_var;
-private int debug_Java2DDisplay_XFRAMESIZE_var;
 private int debug_Java2DDisplay_YFRAMESIZE_var;
+private int debug_Java2DDisplay_XFRAMESIZE_var;
 //Ports
+private Port vctrl_port;
 private Port display_port;
 //Message types
 protected final ClearMessageType clearType = new ClearMessageType();
@@ -191,6 +217,21 @@ public DisplayErrorMessageType getDisplayErrorType(){
 return displayErrorType;
 }
 
+protected final VelocityMessageType velocityType = new VelocityMessageType();
+public VelocityMessageType getVelocityType(){
+return velocityType;
+}
+
+protected final PositionMessageType positionType = new PositionMessageType();
+public PositionMessageType getPositionType(){
+return positionType;
+}
+
+protected final FireMessageType fireType = new FireMessageType();
+public FireMessageType getFireType(){
+return fireType;
+}
+
 //Empty Constructor
 public Java2DDisplay() {
 super();
@@ -204,24 +245,16 @@ this.Java2DDisplay_SCALE_var = Java2DDisplay_SCALE_var;
 }
 
 //Constructor (all attributes)
-public Java2DDisplay(String name, final int Java2DDisplay_SCALE_var, final int Java2DDisplay_XFRAMESIZE_var, final int Java2DDisplay_YFRAMESIZE_var) {
+public Java2DDisplay(String name, final int Java2DDisplay_SCALE_var, final int Java2DDisplay_YFRAMESIZE_var, final int Java2DDisplay_XFRAMESIZE_var) {
 super(name);
 this.Java2DDisplay_SCALE_var = Java2DDisplay_SCALE_var;
-this.Java2DDisplay_XFRAMESIZE_var = Java2DDisplay_XFRAMESIZE_var;
 this.Java2DDisplay_YFRAMESIZE_var = Java2DDisplay_YFRAMESIZE_var;
+this.Java2DDisplay_XFRAMESIZE_var = Java2DDisplay_XFRAMESIZE_var;
 }
 
 //Getters and Setters for non readonly/final attributes
 public int getJava2DDisplay_SCALE_var() {
 return Java2DDisplay_SCALE_var;
-}
-
-public int getJava2DDisplay_XFRAMESIZE_var() {
-return Java2DDisplay_XFRAMESIZE_var;
-}
-
-public void setJava2DDisplay_XFRAMESIZE_var(int Java2DDisplay_XFRAMESIZE_var) {
-this.Java2DDisplay_XFRAMESIZE_var = Java2DDisplay_XFRAMESIZE_var;
 }
 
 public int getJava2DDisplay_YFRAMESIZE_var() {
@@ -232,7 +265,18 @@ public void setJava2DDisplay_YFRAMESIZE_var(int Java2DDisplay_YFRAMESIZE_var) {
 this.Java2DDisplay_YFRAMESIZE_var = Java2DDisplay_YFRAMESIZE_var;
 }
 
+public int getJava2DDisplay_XFRAMESIZE_var() {
+return Java2DDisplay_XFRAMESIZE_var;
+}
+
+public void setJava2DDisplay_XFRAMESIZE_var(int Java2DDisplay_XFRAMESIZE_var) {
+this.Java2DDisplay_XFRAMESIZE_var = Java2DDisplay_XFRAMESIZE_var;
+}
+
 //Getters for Ports
+public Port getVctrl_port() {
+return vctrl_port;
+}
 public Port getDisplay_port() {
 return display_port;
 }
@@ -255,7 +299,7 @@ final AtomicState state_Display_SC_Destroyed = new AtomicState("Destroyed")
 states_Display_SC.add(state_Display_SC_Destroyed);
 final List<Region> regions_Display_SC = new ArrayList<Region>();
 final List<Handler> transitions_Display_SC = new ArrayList<Handler>();
-transitions_Display_SC.add(new Transition("1905174639",createType, display_port, state_Display_SC_Wait, state_Display_SC_Running){
+transitions_Display_SC.add(new Transition("726833325",createType, display_port, state_Display_SC_Wait, state_Display_SC_Running){
 @Override
 public void doExecute(final Event e) {
 final CreateMessageType.CreateMessage create = (CreateMessageType.CreateMessage) e;
@@ -263,7 +307,7 @@ initDisplay((int) (create.xsize), (int) (create.ysize));
 }
 
 });
-transitions_Display_SC.add(new InternalTransition("122171322",setColorType, display_port, state_Display_SC_Running){
+transitions_Display_SC.add(new InternalTransition("649466505",setColorType, display_port, state_Display_SC_Running){
 @Override
 public void doExecute(final Event e) {
 final SetColorMessageType.SetColorMessage setColor = (SetColorMessageType.SetColorMessage) e;
@@ -271,14 +315,14 @@ setColor((int) (setColor.r), (int) (setColor.g), (int) (setColor.b));
 }
 
 });
-transitions_Display_SC.add(new InternalTransition("1030211376",clearType, display_port, state_Display_SC_Running){
+transitions_Display_SC.add(new InternalTransition("1781122891",clearType, display_port, state_Display_SC_Running){
 @Override
 public void doExecute(final Event e) {
 clearScreen();
 }
 
 });
-transitions_Display_SC.add(new InternalTransition("175895640",drawRectType, display_port, state_Display_SC_Running){
+transitions_Display_SC.add(new InternalTransition("462112304",drawRectType, display_port, state_Display_SC_Running){
 @Override
 public void doExecute(final Event e) {
 final DrawRectMessageType.DrawRectMessage drawRect = (DrawRectMessageType.DrawRectMessage) e;
@@ -286,7 +330,7 @@ drawRect((int) (drawRect.x), (int) (drawRect.y), (int) (drawRect.width), (int) (
 }
 
 });
-transitions_Display_SC.add(new InternalTransition("945404639",fillRectType, display_port, state_Display_SC_Running){
+transitions_Display_SC.add(new InternalTransition("1359811368",fillRectType, display_port, state_Display_SC_Running){
 @Override
 public void doExecute(final Event e) {
 final FillRectMessageType.FillRectMessage fillRect = (FillRectMessageType.FillRectMessage) e;
@@ -294,14 +338,14 @@ fillRect((int) (fillRect.x), (int) (fillRect.y), (int) (fillRect.width), (int) (
 }
 
 });
-transitions_Display_SC.add(new InternalTransition("1057599154",updateType, display_port, state_Display_SC_Running){
+transitions_Display_SC.add(new InternalTransition("861612659",updateType, display_port, state_Display_SC_Running){
 @Override
 public void doExecute(final Event e) {
 updateDisplay();
 }
 
 });
-transitions_Display_SC.add(new Transition("1050374066",destroyType, display_port, state_Display_SC_Running, state_Display_SC_Destroyed){
+transitions_Display_SC.add(new Transition("1121971522",destroyType, display_port, state_Display_SC_Running, state_Display_SC_Destroyed){
 @Override
 public void doExecute(final Event e) {
 destroyDisplay();
@@ -315,8 +359,10 @@ return state_Display_SC;
 public Component buildBehavior(String session, Component root) {
 if (root == null) {
 //Init ports
+vctrl_port = new Port(PortType.PROVIDED, "vctrl", this);
 display_port = new Port(PortType.PROVIDED, "display", this);
 } else {
+vctrl_port = ((Java2DDisplay)root).vctrl_port;
 display_port = ((Java2DDisplay)root).display_port;
 }
 createCepStreams();if (session == null){
@@ -360,6 +406,49 @@ Java2DDisplay_YFRAMESIZE_var = (int) (Java2DDisplay_initDisplay_ysize_var);
         frame.add(canevas);
         frame.pack();
         frame.setResizable(false);
+        
+        canevas.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {}
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            	int keyCode = e.getKeyCode();
+			    switch( keyCode ) { 
+			        case KeyEvent.VK_LEFT:
+			            
+sendVelocity_via_vctrl((int) (0), (int) (0));
+
+			            break;
+			        case KeyEvent.VK_RIGHT :
+			            
+sendVelocity_via_vctrl((int) (0), (int) (0));
+
+			            break;
+			     }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int keyCode = e.getKeyCode();
+			    switch( keyCode ) { 
+			        case KeyEvent.VK_LEFT:
+			            
+sendVelocity_via_vctrl((int) ( -8), (int) (0));
+
+			            break;
+			        case KeyEvent.VK_RIGHT :
+			            
+sendVelocity_via_vctrl((int) (8), (int) (0));
+
+			            break;
+			     }
+            }
+        });
+        canevas.setFocusable(true);
+        canevas.requestFocusInWindow();
+        
         frame.setVisible(true);
         
         canevas.repaint();

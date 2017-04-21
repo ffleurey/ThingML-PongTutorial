@@ -8,7 +8,7 @@ configuration SimpleBrickSDL2
 {
 	instance bb : SimpleBrick
 	instance disp : Java2DDisplay
-	instance ctrl : DummyController
+	instance ctrl : VelocityController
 	instance timer : TimerJava
 	
 	connector bb.clock => timer.timer
@@ -16,4 +16,5 @@ configuration SimpleBrickSDL2
 	
 	connector bb.display => disp.display
 	connector bb.controller => ctrl.controls
-}
+	connector ctrl.ctrl_in => disp.vctrl
+}  

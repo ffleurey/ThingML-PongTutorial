@@ -16,46 +16,47 @@ import org.thingml.generated.messages.*;
 import java.util.*;
 public class Main {
 //Things
-public static DummyController DummyController_ctrl;
 public static TimerJava TimerJava_timer;
-public static SimpleBrick SimpleBrick_bb;
 public static Java2DDisplay Java2DDisplay_disp;
+public static SimpleBrick SimpleBrick_bb;
+public static VelocityController VelocityController_ctrl;
 public static void main(String args[]) {
 //Things
-DummyController_ctrl = (DummyController) new DummyController("ctrl (DummyController)", (int) (0), (int) ( -100), (int) (3), (int) (0), (int) (5), (int) (100), (int) ( -100), (int) (100), (int) (5)).buildBehavior(null, null);
 TimerJava_timer = (TimerJava) new TimerJava("timer (TimerJava)").buildBehavior(null, null);
-final int[] bb_bricks_array = new int[5];
-SimpleBrick_bb = (SimpleBrick) new SimpleBrick("bb (SimpleBrick)", (int) (128 * 64 / 2), (int) (9), (int) (2 * 64), (int) (160 * 64 - 2 * 64), (int) (128 * 64), (int) (128 * 64 - 6 * 64), (int) (64), (int) (160 * 64 / 65), (int) (128 * 64 / 2), (int) ( -1), (int) (160 * 64), (int) (160 * 64 / 98), (int) (128), (int) ( -1), (int) (3 * 64), (int) (160 * 64 / 6), bb_bricks_array, (int) (160), (int) (160 * 64 / 2), (int) ( -1), (int) (12 * 64), (int) ( -1), (int) (5), (int) (128 * 64 + 8 * 64)).buildBehavior(null, null);
 Java2DDisplay_disp = (Java2DDisplay) new Java2DDisplay("disp (Java2DDisplay)", (int) (5), (int)0, (int)0).buildBehavior(null, null);
+final int[] bb_bricks_array = new int[5];
+SimpleBrick_bb = (SimpleBrick) new SimpleBrick("bb (SimpleBrick)", (int) (128), (int) (128 * 64 + 8 * 64), (int) (128 * 64 / 2), (int) (128 * 64), (int) (9), (int) (128 * 64 / 2), (int) (2 * 64), (int) (160 * 64 / 2), (int) (160 * 64 / 98), (int) ( -1), (int) (160), (int) (160 * 64 / 6), (int) (160 * 64 - 2 * 64), (int) ( -1), bb_bricks_array, (int) (160 * 64), (int) (5), (int) ( -1), (int) ( -1), (int) (3 * 64), (int) (64), (int) (128 * 64 - 6 * 64), (int) (12 * 64), (int) (160 * 64 / 65)).buildBehavior(null, null);
+VelocityController_ctrl = (VelocityController) new VelocityController("ctrl (VelocityController)", (int) (4), (int) ( -100), (int) ( -100), (int) (0), (int) (0), (int) (100), (int) (0), (int) (0), (int) (100)).buildBehavior(null, null);
 //Connecting internal ports...
 //Connectors
 Java2DDisplay_disp.getDisplay_port().addListener(SimpleBrick_bb.getDisplay_port());
 SimpleBrick_bb.getDisplay_port().addListener(Java2DDisplay_disp.getDisplay_port());
+VelocityController_ctrl.getControls_port().addListener(SimpleBrick_bb.getController_port());
 TimerJava_timer.getTimer_port().addListener(SimpleBrick_bb.getClock_port());
 SimpleBrick_bb.getClock_port().addListener(TimerJava_timer.getTimer_port());
-DummyController_ctrl.getControls_port().addListener(SimpleBrick_bb.getController_port());
-TimerJava_timer.getTimer_port().addListener(DummyController_ctrl.getClock_port());
-DummyController_ctrl.getClock_port().addListener(TimerJava_timer.getTimer_port());
+TimerJava_timer.getTimer_port().addListener(VelocityController_ctrl.getClock_port());
+VelocityController_ctrl.getClock_port().addListener(TimerJava_timer.getTimer_port());
+Java2DDisplay_disp.getVctrl_port().addListener(VelocityController_ctrl.getCtrl_in_port());
 //Init instances (queues, etc)
-DummyController_ctrl.init();
 TimerJava_timer.init();
-SimpleBrick_bb.init();
 Java2DDisplay_disp.init();
+SimpleBrick_bb.init();
+VelocityController_ctrl.init();
 //Network components for external connectors
 /*$NETWORK$*/
 //External Connectors
 /*$EXT CONNECTORS$*/
 /*$START$*/
 TimerJava_timer.start();
-DummyController_ctrl.start();
 Java2DDisplay_disp.start();
+VelocityController_ctrl.start();
 SimpleBrick_bb.start();
 //Hook to stop instances following client/server dependencies (clients firsts)
 Runtime.getRuntime().addShutdownHook(new Thread() {
 public void run() {
 SimpleBrick_bb.stop();
+VelocityController_ctrl.stop();
 Java2DDisplay_disp.stop();
-DummyController_ctrl.stop();
 TimerJava_timer.stop();
 /*$STOP$*/
 }
