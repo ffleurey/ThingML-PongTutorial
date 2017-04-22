@@ -11,9 +11,9 @@ thing BrowserCanvasDisplay includes Display, ControllerMsgs
   property XFRAMESIZE : UInt16
 	property YFRAMESIZE : UInt16
   
-  property Buffer : CanvasContex
+  property Buffer : CanvasContext
   property BufferCanvas : Canvas
-  property Display : CanvasContex
+  property Display : CanvasContext
   
   provided port vctrl {
 		sends fire, velocity

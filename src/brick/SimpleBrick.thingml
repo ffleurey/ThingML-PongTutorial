@@ -11,7 +11,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 
 	required port display {
 		receives displayReady, displayError
-		sends create, fillRect, drawRect, clear, setColor, update
+		sends create, fillRect, drawRect, clear, setColor, setBGColor, drawInteger, update
 	}
 	
 	required port controller {
@@ -28,7 +28,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	readonly property YMAX 	: UInt16 = YDISPSIZE * SCALE
 	
 	// Walls around the play area
-	property TOP 	: Int16 = 12 * SCALE 		// Leave 12 pixels on the top for scores
+	property TOP 	: Int16 = 14 * SCALE 		// Leave 12 pixels on the top for scores
 	property BOTTOM	: Int16 = YMAX + 8 * SCALE	// The bottom wall is off the screen
 	property LEFT	: Int16 = 2 * SCALE			// One pixel for the left wall	
 	property RIGHT	: Int16 = XMAX - 2 * SCALE	// One pixel for the right wall	
@@ -150,10 +150,14 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	
 	statechart SC init INIT {
 		
+		property score : Int16 = 0
+		
 		state INIT {
 			on entry display!create(XDISPSIZE, YDISPSIZE)
 			transition -> PLAY event display?displayReady action do
 				display!clear()
+				display!setBGColor(0,0,0)
+				display!drawInteger(100, 1, score, 5, 2)
 				drawWalls()
 				createBricks()
 			end
@@ -170,9 +174,6 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 			end
 				
 			transition -> PLAY event t : clock?timer_timeout guard t.id == 0 action do
-			
-				// Draw the Pad
-				drawPad()
 			
 				// Calculate the position of the new ball
 				bx = bx + dx
@@ -204,9 +205,15 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 				var collision : Boolean = collideBrick(bx-br, by-br) or collideBrick(bx+br, by-br) or 
 											collideBrick(bx+br, by+br) or collideBrick(bx-br, by+br)
 				
-				if (collision) dy = -dy // Update the direction of the ball
+				if (collision) do 
+					dy = -dy // Update the direction of the ball
+					score = score + 10 // Increment score
+					display!setColor(255,255,255)
+					display!drawInteger(100, 1, score, 5, 2)
+				end
 				
-				drawBall()
+				drawBall() // Draw the Ball
+				drawPad() // Draw the Pad
 				display!update()
 				
 			end
