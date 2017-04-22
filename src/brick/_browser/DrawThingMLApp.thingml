@@ -1,0 +1,15 @@
+import "Display_BrowserCanvas.thingml"
+import "../DrawThingML.thingml"
+import "../Display.thingml"
+
+
+configuration DrawThingMLBrowserCanvas
+{
+	
+	instance bb : DrawThingML
+	instance disp : BrowserCanvasDisplay
+	
+	//connector bb.clock over Timer
+	connector bb.display => disp.display
+  
+}

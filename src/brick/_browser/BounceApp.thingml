@@ -1,0 +1,16 @@
+import "Display_BrowserCanvas.thingml"
+import "../BouncingBall.thingml"
+import "../Display.thingml"
+import "TimerBrowser.thingml"
+
+configuration BounceBrowserCanvas 
+{
+	
+	instance bb : BouncingBall
+	instance disp : BrowserCanvasDisplay
+	instance timer : TimerBrowser
+	
+	connector bb.clock => timer.timer
+	connector bb.display => disp.display
+	
+}

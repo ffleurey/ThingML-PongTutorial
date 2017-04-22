@@ -1,0 +1,20 @@
+import "Display_BrowserCanvas.thingml"
+import "../SimpleBrick.thingml"
+import "../Display.thingml"
+import "../DummyController.thingml"
+import "TimerBrowser.thingml"
+
+configuration SimpleBrickBrowserCanvas 
+{
+	instance bb : SimpleBrick
+	instance disp : BrowserCanvasDisplay
+	instance ctrl : VelocityController
+	instance timer : TimerBrowser
+	
+	connector bb.clock => timer.timer
+  connector ctrl.clock => timer.timer
+	
+	connector bb.display => disp.display
+	connector bb.controller => ctrl.controls
+	connector ctrl.ctrl_in => disp.vctrl
+}  

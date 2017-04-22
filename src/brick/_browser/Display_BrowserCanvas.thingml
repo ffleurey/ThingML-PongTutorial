@@ -1,0 +1,127 @@
+import "../Display.thingml"
+import "../Controller.thingml"
+
+object Canvas;
+object CanvasContext;
+
+thing BrowserCanvasDisplay includes Display, ControllerMsgs
+{
+  readonly property SCALE : UInt8 = 5
+  
+  property XFRAMESIZE : UInt16
+	property YFRAMESIZE : UInt16
+  
+  property Buffer : CanvasContex
+  property BufferCanvas : Canvas
+  property Display : CanvasContex
+  
+  provided port vctrl {
+		sends fire, velocity
+	}
+  
+	function initDisplay(xsize : UInt8, ysize : UInt8) do  
+    XFRAMESIZE = xsize
+    YFRAMESIZE = ysize
+    '
+      document.body.style.backgroundColor = "gray";
+      
+      /* Create buffer canvas */
+      var buffer = document.createElement("canvas");
+      buffer.setAttribute("width", '&XFRAMESIZE&');
+      buffer.setAttribute("height", '&YFRAMESIZE&');
+      buffer.style.imageRendering = "pixelated";
+      '&BufferCanvas&' = buffer;
+      
+      var bufferCtx = buffer.getContext("2d");
+      bufferCtx.imageSmoothingEnabled = false;
+      bufferCtx.mozImageSmoothingEnabled = false;
+      bufferCtx.webkitImageSmoothingEnabled = false;
+      bufferCtx.msImageSmoothingEnabled = false;
+      '&Buffer&' = bufferCtx;
+      
+      /* Create the display canvas */
+      var display = document.createElement("canvas");
+      display.setAttribute("width", '&XFRAMESIZE*SCALE&');
+      display.setAttribute("height", '&YFRAMESIZE*SCALE&');
+      
+      var displayCtx = display.getContext("2d");
+      displayCtx.imageSmoothingEnabled = false;
+      displayCtx.mozImageSmoothingEnabled = false;
+      displayCtx.webkitImageSmoothingEnabled = false;
+      displayCtx.msImageSmoothingEnabled = false;
+      
+      '&Display&' = displayCtx;
+      
+      // Put it in the middle of the window
+      display.style.position = "absolute";
+      display.style.left = "50%";
+      display.style.top = "50%";
+      display.style.marginLeft = '&-XFRAMESIZE/2*SCALE&'+"px";
+      display.style.marginTop = '&-YFRAMESIZE/2*SCALE&'+"px";
+      document.body.appendChild(display);
+      
+      bufferCtx.lineWidth = 2;
+      bufferCtx.fillStyle = "rgb(255,0,0)";
+      bufferCtx.fillRect(0,0,100,100);
+    '
+    clearScreen()
+    
+    /* Add key press event listeners */
+    '
+      document.addEventListener("keydown", (e) => {
+        if (e.key == "ArrowLeft") {
+          'vctrl!velocity(-8,0)'
+        } else if (e.key == "ArrowRight") {
+          'vctrl!velocity( 8,0)'
+        }
+      });
+      document.addEventListener("keyup", (e) => {
+        if (e.key == "ArrowLeft" || e.key == "ArrowRight") {
+          'vctrl!velocity(0,0)'
+        }
+      });
+    '
+  end
+  
+	function destroyDisplay() do
+  end
+  
+	function updateDisplay() do
+    ''&Display&'.drawImage('&BufferCanvas&', 0, 0, '&XFRAMESIZE*SCALE&', '&YFRAMESIZE*SCALE&');'
+    //print "Display updated"
+  end
+	
+  
+	function clearScreen() do
+    setColor(0,0,0)
+    fillRect(0,0,XFRAMESIZE,YFRAMESIZE)
+    updateDisplay()
+  end
+	
+  function setColor(r : UInt8, g : UInt8, b : UInt8) do
+    '
+      '&Buffer&'.strokeStyle = "rgb("+'&r&'+", "+'&g&'+", "+'&b&'+")";
+      '&Buffer&'.fillStyle = "rgb("+'&r&'+", "+'&g&'+", "+'&b&'+")";
+    '
+  end
+  
+	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+    '
+      var xr = Math.round('&x&');
+      var yr = Math.round('&y&');
+      var wr = Math.round('&width&');
+      var hr = Math.round('&height&');
+      '&Buffer&'.strokeRect(xr, yr, wr, hr);
+    '
+  end
+  
+	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+    '
+      var xr = Math.round('&x&');
+      var yr = Math.round('&y&');
+      var wr = Math.round('&width&');
+      var hr = Math.round('&height&');
+      '&Buffer&'.fillRect(xr, yr, wr, hr);
+    '
+  end
+}
