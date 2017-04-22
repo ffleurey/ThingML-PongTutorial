@@ -346,39 +346,6 @@ default: break;
 }
 
 // Event Handlers for incoming messages:
-void SDL2Display_handle_display_setBGColor(struct SDL2Display_Instance *_instance, uint8_t r, uint8_t g, uint8_t b) {
-if(!(_instance->active)) return;
-//Region SC
-uint8_t Display_SC_State_event_consumed = 0;
-if (_instance->Display_SC_State == DISPLAY_SC_RUNNING_STATE) {
-if (Display_SC_State_event_consumed == 0 && 1) {
-_instance->Display_bg_r_var = r;
-_instance->Display_bg_g_var = g;
-_instance->Display_bg_b_var = b;
-Display_SC_State_event_consumed = 1;
-}
-}
-//End Region SC
-//End dsregion SC
-//Session list: 
-}
-void SDL2Display_handle_display_create(struct SDL2Display_Instance *_instance, uint8_t xsize, uint8_t ysize) {
-if(!(_instance->active)) return;
-//Region SC
-uint8_t Display_SC_State_event_consumed = 0;
-if (_instance->Display_SC_State == DISPLAY_SC_WAIT_STATE) {
-if (Display_SC_State_event_consumed == 0 && 1) {
-Display_SC_OnExit(DISPLAY_SC_WAIT_STATE, _instance);
-_instance->Display_SC_State = DISPLAY_SC_RUNNING_STATE;
-f_SDL2Display_initDisplay(_instance, xsize, ysize);
-Display_SC_OnEntry(DISPLAY_SC_RUNNING_STATE, _instance);
-Display_SC_State_event_consumed = 1;
-}
-}
-//End Region SC
-//End dsregion SC
-//Session list: 
-}
 void SDL2Display_handle_display_drawRect(struct SDL2Display_Instance *_instance, uint8_t x, uint8_t y, uint8_t width, uint8_t height) {
 if(!(_instance->active)) return;
 //Region SC
@@ -410,13 +377,33 @@ Display_SC_State_event_consumed = 1;
 //End dsregion SC
 //Session list: 
 }
-void SDL2Display_handle_display_drawInteger(struct SDL2Display_Instance *_instance, uint8_t x, uint8_t y, int16_t v, uint8_t digits, uint8_t scale) {
+void SDL2Display_handle_display_setColor(struct SDL2Display_Instance *_instance, uint8_t r, uint8_t g, uint8_t b) {
 if(!(_instance->active)) return;
 //Region SC
 uint8_t Display_SC_State_event_consumed = 0;
 if (_instance->Display_SC_State == DISPLAY_SC_RUNNING_STATE) {
 if (Display_SC_State_event_consumed == 0 && 1) {
-f_SDL2Display_drawInteger(_instance, x, y, v, digits, scale);
+_instance->Display_fg_r_var = r;
+_instance->Display_fg_g_var = g;
+_instance->Display_fg_b_var = b;
+f_SDL2Display_setColor(_instance, r, g, b);
+Display_SC_State_event_consumed = 1;
+}
+}
+//End Region SC
+//End dsregion SC
+//Session list: 
+}
+void SDL2Display_handle_display_create(struct SDL2Display_Instance *_instance, uint8_t xsize, uint8_t ysize) {
+if(!(_instance->active)) return;
+//Region SC
+uint8_t Display_SC_State_event_consumed = 0;
+if (_instance->Display_SC_State == DISPLAY_SC_WAIT_STATE) {
+if (Display_SC_State_event_consumed == 0 && 1) {
+Display_SC_OnExit(DISPLAY_SC_WAIT_STATE, _instance);
+_instance->Display_SC_State = DISPLAY_SC_RUNNING_STATE;
+f_SDL2Display_initDisplay(_instance, xsize, ysize);
+Display_SC_OnEntry(DISPLAY_SC_RUNNING_STATE, _instance);
 Display_SC_State_event_consumed = 1;
 }
 }
@@ -452,16 +439,29 @@ Display_SC_State_event_consumed = 1;
 //End dsregion SC
 //Session list: 
 }
-void SDL2Display_handle_display_setColor(struct SDL2Display_Instance *_instance, uint8_t r, uint8_t g, uint8_t b) {
+void SDL2Display_handle_display_drawInteger(struct SDL2Display_Instance *_instance, uint8_t x, uint8_t y, int16_t v, uint8_t digits, uint8_t scale) {
 if(!(_instance->active)) return;
 //Region SC
 uint8_t Display_SC_State_event_consumed = 0;
 if (_instance->Display_SC_State == DISPLAY_SC_RUNNING_STATE) {
 if (Display_SC_State_event_consumed == 0 && 1) {
-_instance->Display_fg_r_var = r;
-_instance->Display_fg_g_var = g;
-_instance->Display_fg_b_var = b;
-f_SDL2Display_setColor(_instance, r, g, b);
+f_SDL2Display_drawInteger(_instance, x, y, v, digits, scale);
+Display_SC_State_event_consumed = 1;
+}
+}
+//End Region SC
+//End dsregion SC
+//Session list: 
+}
+void SDL2Display_handle_display_setBGColor(struct SDL2Display_Instance *_instance, uint8_t r, uint8_t g, uint8_t b) {
+if(!(_instance->active)) return;
+//Region SC
+uint8_t Display_SC_State_event_consumed = 0;
+if (_instance->Display_SC_State == DISPLAY_SC_RUNNING_STATE) {
+if (Display_SC_State_event_consumed == 0 && 1) {
+_instance->Display_bg_r_var = r;
+_instance->Display_bg_g_var = g;
+_instance->Display_bg_b_var = b;
 Display_SC_State_event_consumed = 1;
 }
 }

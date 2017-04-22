@@ -4,6 +4,9 @@ import "Controller.thingml"
 
 thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	
+	message lostBall();
+	message nextLevel();
+	
 	required port clock {
 		sends timer_start, timer_cancel
 		receives timer_timeout
@@ -16,6 +19,11 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	
 	required port controller {
 		receives position
+	}
+	
+	internal port game {
+		sends lostBall, nextLevel
+		receives lostBall, nextLevel
 	}
 	
 	// Size of the real display
@@ -36,9 +44,9 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	// Ball variables
 	property br : Int16 = 3 * SCALE 			// Radius of the ball
 	property bx : Int16 = XMAX / 2				// Center of the ball
-	property by : Int16 = YMAX / 2				// Center of the ball
-	property dx : Int16 = XMAX / 98			// Horizontal speed of the ball
-	property dy : Int16 = XMAX / 65			// Vertical speed of the ball
+	property by : Int16 = YMAX					// Center of the ball
+	property dx : Int16 = XMAX / 98				// Horizontal speed of the ball
+	property dy : Int16 = -XMAX / 65			// Vertical speed of the ball
 	
 	// Pad variables
 	property padx 	: Int16 = YMAX / 2			// Middle of the pad
@@ -58,13 +66,26 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
 	end
 	
-	function drawBall() do
+	function resetBall() do
+		bx = padx - br/SCALE		
+		by = pady - br/SCALE	
+		dx = XMAX / 98			
+		dy = -XMAX / 65
+	end
+	
+	function eraseBall() do
 		var bs : UInt8 = (br*2)/SCALE 	// Size of the ball on the actual display
 		
 		if (prevBX > 0) do				// Erase the previous ball
 			display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
 			display!fillRect(prevBX, prevBY, bs, bs)
 		end
+	end
+	
+	function drawBall() do
+		var bs : UInt8 = (br*2)/SCALE 	// Size of the ball on the actual display
+		
+		eraseBall()
 		
 		// Compute new position of the ball on the actual display
 		prevBX = (bx-br)/SCALE
@@ -80,20 +101,38 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	property prevPX	: Int16 = -1
 	property prevPY	: Int16 = -1 
 	
-	function drawPad() do
+	function erasePad() do
 		var ps : UInt8 = padlen/SCALE 	// Size of the pad on the actual display
 	
 		if (prevPX > 0) do				// Erase the previous ball
 			display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
 			display!fillRect(prevPX, prevPY, ps, 4)
 		end
+	end
+	
+	function drawPad() do
+		var ps : UInt8 = padlen/SCALE 	// Size of the pad on the actual display
+	
+		erasePad()
 		
 		prevPX = (padx - (padlen/2)) / SCALE
 		prevPY = pady / SCALE
 		
 		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
-		//display!setColor(255,255,255)
 		display!fillRect(prevPX, prevPY, ps, 4)
+	end
+	
+	function drawCountDown(c : UInt8) do
+		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
+		if (c > 0) do 
+			display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
+			display!setBGColor(bgcolor[0],bgcolor[1],bgcolor[2])
+			display!drawInteger(80-6, 90, c, 1, 4)
+		end
+		else do 
+			display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
+			display!fillRect(80-6, 90, 12, 20)
+		end
 	end
 	
 	function drawWalls() do
@@ -129,6 +168,22 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		end
 	end
 	
+	function bricksLeft() : UInt8 do
+		var result : UInt8 = 0
+		var y : Int8 = 0
+		while (y<BRICK_ROWS) do
+			var x : Int8 = 0
+			while(x < 8) do
+				if ( bitIsSet(bricks[y], x) ) do
+					result = result + 1
+				end
+				x = x + 1
+			end
+			y = y + 1
+		end
+		return result
+	end
+	
 	function drawBrick(x : UInt8, y: UInt8) do
 		var bx : Int16 = LEFT + ((RIGHT-LEFT)/8) * x
 		var by : Int16 = TOP + 20 * SCALE + BRICK_HEIGHT * y * SCALE
@@ -160,23 +215,39 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	end
 	
 	property score : Int16 = 0
+	property lives : UInt8 = 3
+	property level : UInt8 = 1
+	
 	function drawScore() do
 		display!setColor(158,209,130)
 		display!drawInteger(98, 2, score, 5, 2)
 	end
 	
 	function drawLives() do
+		// erase all existing ball
+		display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
+		display!fillRect(22,4,36, 6)
 		display!setColor(183, 199, 111)
-		display!fillRect(22,4,6, 6)
-		display!fillRect(37,4,6, 6)
-		display!fillRect(52,4,6, 6)
+		var i : UInt8 = 0
+		while(i<lives) do
+			display!fillRect(22 + i*15,4,6, 6)
+			i = i + 1
+		end
+
 	end
+	
 	
 	statechart SC init INIT {
 		
+		internal event e : controller?position action do
+			// Map the controller values [-100..100] to the pad position
+			var center : Int16 = (RIGHT - LEFT) / 2
+			padx = LEFT + center + (e.x * (RIGHT - LEFT - padlen)) / 200
+		end
+		
 		state INIT {
 			on entry display!create(XDISPSIZE, YDISPSIZE)
-			transition -> PLAY event display?displayReady action do
+			transition -> LAUNCH event display?displayReady action do
 				display!clear()
 				initColors()
 				display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
@@ -186,23 +257,42 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 				display!fillRect(0,0,18, 14)
 				display!fillRect(90-28,0,28, 14)
 				display!fillRect(XDISPSIZE-18,0,18, 14)
-				drawScore()
-				drawLives()
 				drawWalls()
 				createBricks()
+			end
+		}
+		
+		state LAUNCH {
+			property countdown : Int8
+			
+			on entry do 
+				clock!timer_start(0, 33)
+				countdown = 30*3 // 3sec
+				drawScore()
+				drawLives()
+				display!update()
+			end
+			
+			internal event t : clock?timer_timeout 
+			guard t.id == 0 and countdown > 0 action do
+				clock!timer_start(0, 33)
+				drawPad() // Draw the Pad
+				drawCountDown(countdown/30+1)
+				countdown = countdown - 1
+				display!update()
+			end
+			
+			transition -> PLAY  event t : clock?timer_timeout 
+			guard t.id == 0 and countdown == 0 action do
+				drawCountDown(0)
+				resetBall()
+				display!update()
 			end
 		}
 		
 		state PLAY {
 
 			on entry clock!timer_start(0, 33)
-			
-			internal event e : controller?position action do
-				// Map the controller values [-100..100] to the pad position
-				var center : Int16 = (RIGHT - LEFT) / 2
-				padx = LEFT + center + (e.x * (RIGHT - LEFT - padlen)) / 200
-			end
-				
 			transition -> PLAY event t : clock?timer_timeout guard t.id == 0 action do
 			
 				// Calculate the position of the new ball
@@ -218,7 +308,9 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 				if (bx < wl) 		do	dx = -dx 	bx = 2*wl-bx	end
 				else if (bx > wr)	do	dx = -dx	bx = 2*wr-bx	end
 				if (by < wt)		do	dy = -dy	by = 2*wt-by	end
-				else if (by > wb)	do	dy = -dy	by = 2*wb-by	end
+				else if (by > wb)	do	
+					game!lostBall()	
+				end
 				
 				// check for collision with the pad
 				if (dy > 0) do // the ball has to be going down
@@ -239,13 +331,70 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 					dy = -dy // Update the direction of the ball
 					score = score + 10 // Increment score
 					drawScore()
+					if (bricksLeft() == 0) game!nextLevel()
 				end
 				
 				drawBall() // Draw the Ball
 				drawPad() // Draw the Pad
 				display!update()
-				
 			end
+			
+			transition -> LOSTBALL event game?lostBall
+			transition -> NEXTLEVEL event game?nextLevel
 		}
+		
+		state LOSTBALL {
+
+			on entry do 
+				clock!timer_start(0, 1000)
+				lives = lives - 1
+				eraseBall()
+				erasePad()
+				drawLives()
+				display!update()
+			end
+			
+			transition -> LAUNCH event t : clock?timer_timeout 
+			guard t.id == 0 and lives > 0
+			
+			transition -> GAMEOVER event t : clock?timer_timeout 
+			guard t.id == 0 and lives == 0
+		}
+		
+		state NEXTLEVEL {
+			
+			on entry do 
+				clock!timer_start(0, 1000)
+				level = level + 1
+				eraseBall()
+				erasePad()
+				drawLives()
+				createBricks()
+				display!update()
+			end
+			
+			transition -> LAUNCH event t : clock?timer_timeout guard t.id == 0
+			
+		}
+		
+		state GAMEOVER {
+
+			on entry do 
+				clock!timer_start(0, 500)
+				lives = lives - 1
+				eraseBall()
+				erasePad()
+				display!setColor(255,255,255)
+				display!drawRect(10, 46, 140, 50)
+				display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
+				display!fillRect(11, 47, 138, 48)
+				display!setBGColor(fgcolor[0],fgcolor[1],fgcolor[2])
+				display!setColor(158,209,130)
+				display!drawInteger(23, 56, score, 5, 6)
+				display!update()
+			end
+
+		}
+		
 	}
 }

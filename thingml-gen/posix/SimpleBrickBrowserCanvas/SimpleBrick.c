@@ -25,7 +25,6 @@ void SimpleBrick_send_display_setBGColor(struct SimpleBrick_Instance *_instance,
 void SimpleBrick_send_display_drawInteger(struct SimpleBrick_Instance *_instance, uint8_t x, uint8_t y, int16_t v, uint8_t digits, uint8_t scale);
 void SimpleBrick_send_display_update(struct SimpleBrick_Instance *_instance);
 void SimpleBrick_send_game_lostBall(struct SimpleBrick_Instance *_instance);
-void SimpleBrick_send_game_nextLevel(struct SimpleBrick_Instance *_instance);
 //Prototypes: Function
 void f_SimpleBrick_initColors(struct SimpleBrick_Instance *_instance);
 void f_SimpleBrick_resetBall(struct SimpleBrick_Instance *_instance);
@@ -39,7 +38,6 @@ uint8_t f_SimpleBrick_bitIsSet(struct SimpleBrick_Instance *_instance, uint8_t v
 uint8_t f_SimpleBrick_setBit(struct SimpleBrick_Instance *_instance, uint8_t variable, uint8_t bit);
 uint8_t f_SimpleBrick_unsetBit(struct SimpleBrick_Instance *_instance, uint8_t variable, uint8_t bit);
 void f_SimpleBrick_createBricks(struct SimpleBrick_Instance *_instance);
-uint8_t f_SimpleBrick_bricksLeft(struct SimpleBrick_Instance *_instance);
 void f_SimpleBrick_drawBrick(struct SimpleBrick_Instance *_instance, uint8_t x, uint8_t y);
 void f_SimpleBrick_removeBrick(struct SimpleBrick_Instance *_instance, uint8_t x, uint8_t y);
 uint8_t f_SimpleBrick_collideBrick(struct SimpleBrick_Instance *_instance, int16_t xpos, int16_t ypos);
@@ -65,7 +63,7 @@ SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_fgcolor_var[
 }
 // Definition of function resetBall
 void f_SimpleBrick_resetBall(struct SimpleBrick_Instance *_instance) {
-_instance->SimpleBrick_bx_var = _instance->SimpleBrick_padx_var - _instance->SimpleBrick_br_var / _instance->SimpleBrick_SCALE_var;
+_instance->SimpleBrick_bx_var = _instance->SimpleBrick_padx_var;
 _instance->SimpleBrick_by_var = _instance->SimpleBrick_pady_var - _instance->SimpleBrick_br_var / _instance->SimpleBrick_SCALE_var;
 _instance->SimpleBrick_dx_var = _instance->SimpleBrick_XMAX_var / 98;
 _instance->SimpleBrick_dy_var =  -_instance->SimpleBrick_XMAX_var / 65;
@@ -122,22 +120,10 @@ SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_fgcolor_var[
 , _instance->SimpleBrick_fgcolor_var[2]
 );
 if(c > 0) {
-SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_fgcolor_var[0]
-, _instance->SimpleBrick_fgcolor_var[1]
-, _instance->SimpleBrick_fgcolor_var[2]
-);
-SimpleBrick_send_display_setBGColor(_instance, _instance->SimpleBrick_bgcolor_var[0]
-, _instance->SimpleBrick_bgcolor_var[1]
-, _instance->SimpleBrick_bgcolor_var[2]
-);
-SimpleBrick_send_display_drawInteger(_instance, 80 - 6, 90, c, 1, 4);
+SimpleBrick_send_display_drawInteger(_instance, _instance->SimpleBrick_prevPX_var - 6, _instance->SimpleBrick_prevPY_var - 21, c, 1, 4);
 
 } else {
-SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_bgcolor_var[0]
-, _instance->SimpleBrick_bgcolor_var[1]
-, _instance->SimpleBrick_bgcolor_var[2]
-);
-SimpleBrick_send_display_fillRect(_instance, 80 - 6, 90, 12, 20);
+SimpleBrick_send_display_fillRect(_instance, _instance->SimpleBrick_prevPX_var - 6, _instance->SimpleBrick_prevPY_var - 21, 12, 20);
 
 }
 }
@@ -182,26 +168,6 @@ x = x + 1;
 y = y + 1;
 
 }
-}
-// Definition of function bricksLeft
-uint8_t f_SimpleBrick_bricksLeft(struct SimpleBrick_Instance *_instance) {
-;uint8_t result = 0;
-;int8_t y = 0;
-while(y < _instance->SimpleBrick_BRICK_ROWS_var) {
-;int8_t x = 0;
-while(x < 8) {
-if(f_SimpleBrick_bitIsSet(_instance, _instance->SimpleBrick_bricks_var[y]
-, x)) {
-result = result + 1;
-
-}
-x = x + 1;
-
-}
-y = y + 1;
-
-}
-return result;
 }
 // Definition of function drawBrick
 void f_SimpleBrick_drawBrick(struct SimpleBrick_Instance *_instance, uint8_t x, uint8_t y) {
@@ -251,7 +217,7 @@ SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_bgcolor_var[
 , _instance->SimpleBrick_bgcolor_var[1]
 , _instance->SimpleBrick_bgcolor_var[2]
 );
-SimpleBrick_send_display_fillRect(_instance, 22, 4, 36, 6);
+SimpleBrick_send_display_fillRect(_instance, 22, 4, 6, 36);
 SimpleBrick_send_display_setColor(_instance, 183, 199, 111);
 ;uint8_t i = 0;
 while(i < _instance->SimpleBrick_lives_var) {
@@ -278,32 +244,19 @@ break;
 }
 case SIMPLEBRICK_SC_LAUNCH_STATE:{
 SimpleBrick_send_clock_timer_start(_instance, 0, 33);
-_instance->SimpleBrick_SC_LAUNCH_countdown_var = 30 * 3;
-f_SimpleBrick_drawScore(_instance);
-f_SimpleBrick_drawLives(_instance);
-SimpleBrick_send_display_update(_instance);
 break;
 }
 case SIMPLEBRICK_SC_PLAY_STATE:{
 SimpleBrick_send_clock_timer_start(_instance, 0, 33);
-break;
-}
-case SIMPLEBRICK_SC_LOSTBALL_STATE:{
-SimpleBrick_send_clock_timer_start(_instance, 0, 1000);
-_instance->SimpleBrick_lives_var = _instance->SimpleBrick_lives_var - 1;
-f_SimpleBrick_eraseBall(_instance);
-f_SimpleBrick_erasePad(_instance);
-f_SimpleBrick_drawLives(_instance);
+f_SimpleBrick_resetBall(_instance);
 SimpleBrick_send_display_update(_instance);
 break;
 }
-case SIMPLEBRICK_SC_NEXTLEVEL_STATE:{
-SimpleBrick_send_clock_timer_start(_instance, 0, 1000);
-_instance->SimpleBrick_level_var = _instance->SimpleBrick_level_var + 1;
+case SIMPLEBRICK_SC_LOSTBALL_STATE:{
+SimpleBrick_send_clock_timer_start(_instance, 0, 500);
+_instance->SimpleBrick_lives_var = _instance->SimpleBrick_lives_var - 1;
 f_SimpleBrick_eraseBall(_instance);
 f_SimpleBrick_erasePad(_instance);
-f_SimpleBrick_drawLives(_instance);
-f_SimpleBrick_createBricks(_instance);
 SimpleBrick_send_display_update(_instance);
 break;
 }
@@ -312,19 +265,8 @@ SimpleBrick_send_clock_timer_start(_instance, 0, 500);
 _instance->SimpleBrick_lives_var = _instance->SimpleBrick_lives_var - 1;
 f_SimpleBrick_eraseBall(_instance);
 f_SimpleBrick_erasePad(_instance);
-SimpleBrick_send_display_setColor(_instance, 255, 255, 255);
-SimpleBrick_send_display_drawRect(_instance, 10, 46, 140, 50);
-SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_fgcolor_var[0]
-, _instance->SimpleBrick_fgcolor_var[1]
-, _instance->SimpleBrick_fgcolor_var[2]
-);
-SimpleBrick_send_display_fillRect(_instance, 11, 47, 138, 48);
-SimpleBrick_send_display_setBGColor(_instance, _instance->SimpleBrick_fgcolor_var[0]
-, _instance->SimpleBrick_fgcolor_var[1]
-, _instance->SimpleBrick_fgcolor_var[2]
-);
 SimpleBrick_send_display_setColor(_instance, 158, 209, 130);
-SimpleBrick_send_display_drawInteger(_instance, 23, 56, _instance->SimpleBrick_score_var, 5, 6);
+SimpleBrick_send_display_drawInteger(_instance, 20, 56, _instance->SimpleBrick_score_var, 5, 6);
 SimpleBrick_send_display_update(_instance);
 break;
 }
@@ -346,8 +288,6 @@ case SIMPLEBRICK_SC_PLAY_STATE:{
 break;}
 case SIMPLEBRICK_SC_LOSTBALL_STATE:{
 break;}
-case SIMPLEBRICK_SC_NEXTLEVEL_STATE:{
-break;}
 case SIMPLEBRICK_SC_GAMEOVER_STATE:{
 break;}
 default: break;
@@ -355,38 +295,18 @@ default: break;
 }
 
 // Event Handlers for incoming messages:
-void SimpleBrick_handle_display_displayReady(struct SimpleBrick_Instance *_instance) {
+void SimpleBrick_handle_controller_position(struct SimpleBrick_Instance *_instance, int16_t x, int16_t y) {
 if(!(_instance->active)) return;
 //Region SC
 uint8_t SimpleBrick_SC_State_event_consumed = 0;
-if (_instance->SimpleBrick_SC_State == SIMPLEBRICK_SC_INIT_STATE) {
-if (SimpleBrick_SC_State_event_consumed == 0 && 1) {
-SimpleBrick_SC_OnExit(SIMPLEBRICK_SC_INIT_STATE, _instance);
-_instance->SimpleBrick_SC_State = SIMPLEBRICK_SC_LAUNCH_STATE;
-SimpleBrick_send_display_clear(_instance);
-f_SimpleBrick_initColors(_instance);
-SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_bgcolor_var[0]
-, _instance->SimpleBrick_bgcolor_var[1]
-, _instance->SimpleBrick_bgcolor_var[2]
-);
-SimpleBrick_send_display_fillRect(_instance, 0, 0, _instance->SimpleBrick_XDISPSIZE_var, _instance->SimpleBrick_YDISPSIZE_var);
-SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_fgcolor_var[0]
-, _instance->SimpleBrick_fgcolor_var[1]
-, _instance->SimpleBrick_fgcolor_var[2]
-);
-SimpleBrick_send_display_fillRect(_instance, 0, 0, _instance->SimpleBrick_XDISPSIZE_var, 1);
-SimpleBrick_send_display_fillRect(_instance, 0, 0, 18, 14);
-SimpleBrick_send_display_fillRect(_instance, 90 - 28, 0, 28, 14);
-SimpleBrick_send_display_fillRect(_instance, _instance->SimpleBrick_XDISPSIZE_var - 18, 0, 18, 14);
-f_SimpleBrick_drawWalls(_instance);
-f_SimpleBrick_createBricks(_instance);
-SimpleBrick_SC_OnEntry(SIMPLEBRICK_SC_LAUNCH_STATE, _instance);
-SimpleBrick_SC_State_event_consumed = 1;
-}
-}
 //End Region SC
 //End dsregion SC
 //Session list: 
+if (1) {
+;int16_t center = (_instance->SimpleBrick_RIGHT_var - _instance->SimpleBrick_LEFT_var) / 2;
+_instance->SimpleBrick_padx_var = _instance->SimpleBrick_LEFT_var + center + (x * (_instance->SimpleBrick_RIGHT_var - _instance->SimpleBrick_LEFT_var - _instance->SimpleBrick_padlen_var)) / 200;
+SimpleBrick_SC_State_event_consumed = 1;
+}
 }
 void SimpleBrick_handle_clock_timer_timeout(struct SimpleBrick_Instance *_instance, uint8_t id) {
 if(!(_instance->active)) return;
@@ -397,8 +317,6 @@ if (SimpleBrick_SC_State_event_consumed == 0 && id == 0 && _instance->SimpleBric
 SimpleBrick_SC_OnExit(SIMPLEBRICK_SC_LAUNCH_STATE, _instance);
 _instance->SimpleBrick_SC_State = SIMPLEBRICK_SC_PLAY_STATE;
 f_SimpleBrick_drawCountDown(_instance, 0);
-f_SimpleBrick_resetBall(_instance);
-SimpleBrick_send_display_update(_instance);
 SimpleBrick_SC_OnEntry(SIMPLEBRICK_SC_PLAY_STATE, _instance);
 SimpleBrick_SC_State_event_consumed = 1;
 }
@@ -461,10 +379,6 @@ if(collision) {
 _instance->SimpleBrick_dy_var =  -_instance->SimpleBrick_dy_var;
 _instance->SimpleBrick_score_var = _instance->SimpleBrick_score_var + 10;
 f_SimpleBrick_drawScore(_instance);
-if(f_SimpleBrick_bricksLeft(_instance) == 0) {
-SimpleBrick_send_game_nextLevel(_instance);
-
-}
 
 }
 f_SimpleBrick_drawBall(_instance);
@@ -488,10 +402,37 @@ SimpleBrick_SC_OnEntry(SIMPLEBRICK_SC_GAMEOVER_STATE, _instance);
 SimpleBrick_SC_State_event_consumed = 1;
 }
 }
-else if (_instance->SimpleBrick_SC_State == SIMPLEBRICK_SC_NEXTLEVEL_STATE) {
-if (SimpleBrick_SC_State_event_consumed == 0 && id == 0) {
-SimpleBrick_SC_OnExit(SIMPLEBRICK_SC_NEXTLEVEL_STATE, _instance);
+//End Region SC
+//End dsregion SC
+//Session list: 
+}
+void SimpleBrick_handle_display_displayReady(struct SimpleBrick_Instance *_instance) {
+if(!(_instance->active)) return;
+//Region SC
+uint8_t SimpleBrick_SC_State_event_consumed = 0;
+if (_instance->SimpleBrick_SC_State == SIMPLEBRICK_SC_INIT_STATE) {
+if (SimpleBrick_SC_State_event_consumed == 0 && 1) {
+SimpleBrick_SC_OnExit(SIMPLEBRICK_SC_INIT_STATE, _instance);
 _instance->SimpleBrick_SC_State = SIMPLEBRICK_SC_LAUNCH_STATE;
+SimpleBrick_send_display_clear(_instance);
+f_SimpleBrick_initColors(_instance);
+SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_bgcolor_var[0]
+, _instance->SimpleBrick_bgcolor_var[1]
+, _instance->SimpleBrick_bgcolor_var[2]
+);
+SimpleBrick_send_display_fillRect(_instance, 0, 0, _instance->SimpleBrick_XDISPSIZE_var, _instance->SimpleBrick_YDISPSIZE_var);
+SimpleBrick_send_display_setColor(_instance, _instance->SimpleBrick_fgcolor_var[0]
+, _instance->SimpleBrick_fgcolor_var[1]
+, _instance->SimpleBrick_fgcolor_var[2]
+);
+SimpleBrick_send_display_fillRect(_instance, 0, 0, _instance->SimpleBrick_XDISPSIZE_var, 1);
+SimpleBrick_send_display_fillRect(_instance, 0, 0, 18, 14);
+SimpleBrick_send_display_fillRect(_instance, 90 - 28, 0, 28, 14);
+SimpleBrick_send_display_fillRect(_instance, _instance->SimpleBrick_XDISPSIZE_var - 18, 0, 18, 14);
+f_SimpleBrick_drawScore(_instance);
+f_SimpleBrick_drawLives(_instance);
+f_SimpleBrick_drawWalls(_instance);
+f_SimpleBrick_createBricks(_instance);
 SimpleBrick_SC_OnEntry(SIMPLEBRICK_SC_LAUNCH_STATE, _instance);
 SimpleBrick_SC_State_event_consumed = 1;
 }
@@ -499,19 +440,6 @@ SimpleBrick_SC_State_event_consumed = 1;
 //End Region SC
 //End dsregion SC
 //Session list: 
-}
-void SimpleBrick_handle_controller_position(struct SimpleBrick_Instance *_instance, int16_t x, int16_t y) {
-if(!(_instance->active)) return;
-//Region SC
-uint8_t SimpleBrick_SC_State_event_consumed = 0;
-//End Region SC
-//End dsregion SC
-//Session list: 
-if (1) {
-;int16_t center = (_instance->SimpleBrick_RIGHT_var - _instance->SimpleBrick_LEFT_var) / 2;
-_instance->SimpleBrick_padx_var = _instance->SimpleBrick_LEFT_var + center + (x * (_instance->SimpleBrick_RIGHT_var - _instance->SimpleBrick_LEFT_var - _instance->SimpleBrick_padlen_var)) / 200;
-SimpleBrick_SC_State_event_consumed = 1;
-}
 }
 void SimpleBrick_handle_game_lostBall(struct SimpleBrick_Instance *_instance) {
 if(!(_instance->active)) return;
@@ -522,22 +450,6 @@ if (SimpleBrick_SC_State_event_consumed == 0 && 1) {
 SimpleBrick_SC_OnExit(SIMPLEBRICK_SC_PLAY_STATE, _instance);
 _instance->SimpleBrick_SC_State = SIMPLEBRICK_SC_LOSTBALL_STATE;
 SimpleBrick_SC_OnEntry(SIMPLEBRICK_SC_LOSTBALL_STATE, _instance);
-SimpleBrick_SC_State_event_consumed = 1;
-}
-}
-//End Region SC
-//End dsregion SC
-//Session list: 
-}
-void SimpleBrick_handle_game_nextLevel(struct SimpleBrick_Instance *_instance) {
-if(!(_instance->active)) return;
-//Region SC
-uint8_t SimpleBrick_SC_State_event_consumed = 0;
-if (_instance->SimpleBrick_SC_State == SIMPLEBRICK_SC_PLAY_STATE) {
-if (SimpleBrick_SC_State_event_consumed == 0 && 1) {
-SimpleBrick_SC_OnExit(SIMPLEBRICK_SC_PLAY_STATE, _instance);
-_instance->SimpleBrick_SC_State = SIMPLEBRICK_SC_NEXTLEVEL_STATE;
-SimpleBrick_SC_OnEntry(SIMPLEBRICK_SC_NEXTLEVEL_STATE, _instance);
 SimpleBrick_SC_State_event_consumed = 1;
 }
 }
@@ -688,19 +600,6 @@ SimpleBrick_send_game_lostBall_listener = _listener;
 void SimpleBrick_send_game_lostBall(struct SimpleBrick_Instance *_instance){
 if (SimpleBrick_send_game_lostBall_listener != 0x0) SimpleBrick_send_game_lostBall_listener(_instance);
 if (external_SimpleBrick_send_game_lostBall_listener != 0x0) external_SimpleBrick_send_game_lostBall_listener(_instance);
-;
-}
-void (*external_SimpleBrick_send_game_nextLevel_listener)(struct SimpleBrick_Instance *)= 0x0;
-void (*SimpleBrick_send_game_nextLevel_listener)(struct SimpleBrick_Instance *)= 0x0;
-void register_external_SimpleBrick_send_game_nextLevel_listener(void (*_listener)(struct SimpleBrick_Instance *)){
-external_SimpleBrick_send_game_nextLevel_listener = _listener;
-}
-void register_SimpleBrick_send_game_nextLevel_listener(void (*_listener)(struct SimpleBrick_Instance *)){
-SimpleBrick_send_game_nextLevel_listener = _listener;
-}
-void SimpleBrick_send_game_nextLevel(struct SimpleBrick_Instance *_instance){
-if (SimpleBrick_send_game_nextLevel_listener != 0x0) SimpleBrick_send_game_nextLevel_listener(_instance);
-if (external_SimpleBrick_send_game_nextLevel_listener != 0x0) external_SimpleBrick_send_game_nextLevel_listener(_instance);
 ;
 }
 

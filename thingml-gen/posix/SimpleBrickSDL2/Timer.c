@@ -114,12 +114,12 @@ void Timer_timer_cancel(uint8_t id)
 }
 
 // Message forwarders
-// Forwarding of messages Timer::SimpleBrick::clock::timer_cancel
-void forward_Timer_SimpleBrick_send_clock_timer_cancel(struct SimpleBrick_Instance *_instance, uint8_t id){
-    Timer_timer_cancel(id);
-}
 // Forwarding of messages Timer::SimpleBrick::clock::timer_start
 void forward_Timer_SimpleBrick_send_clock_timer_start(struct SimpleBrick_Instance *_instance, uint8_t id, uint32_t time){
     Timer_timer_start(id, time);
+}
+// Forwarding of messages Timer::SimpleBrick::clock::timer_cancel
+void forward_Timer_SimpleBrick_send_clock_timer_cancel(struct SimpleBrick_Instance *_instance, uint8_t id){
+    Timer_timer_cancel(id);
 }
 

@@ -16,7 +16,7 @@
 #include "runtime.h"
 
 
-#define MAX_INSTANCES 7
+#define MAX_INSTANCES 10
 #define FIFO_SIZE 32768
 
 /*********************************
