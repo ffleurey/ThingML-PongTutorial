@@ -3,8 +3,8 @@
 /*****************************************************/
 #include <stdint.h>
 
-#include "SDL2Display.h"
 #include "SimpleBrick.h"
+#include "SDL2Display.h"
 
 
 #define NB_SOFT_TIMERS 4

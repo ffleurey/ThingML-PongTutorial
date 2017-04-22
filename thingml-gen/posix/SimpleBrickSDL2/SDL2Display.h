@@ -35,28 +35,28 @@ uint16_t id_controls;
 // Variables for the current instance state
 int Display_SC_State;
 // Variables for the properties of the instance
+int16_t SDL2Display_xctrl_var;
+uint8_t Display_bg_g_var;
+uint8_t Display_fg_r_var;
 uint8_t SDL2Display_scale_var;
+uint8_t Display_bg_r_var;
 uint8_t Display_fg_b_var;
 uint8_t Display_bg_b_var;
-uint8_t Display_bg_r_var;
-uint8_t Display_bg_g_var;
 uint8_t Display_fg_g_var;
-int16_t SDL2Display_xctrl_var;
 uint16_t SDL2Display_YFRAMESIZE_var;
-uint8_t Display_fg_r_var;
 uint16_t SDL2Display_XFRAMESIZE_var;
 
 };
 // Declaration of prototypes outgoing messages:
 void Display_SC_OnEntry(int state, struct SDL2Display_Instance *_instance);
-void SDL2Display_handle_display_setColor(struct SDL2Display_Instance *_instance, uint8_t r, uint8_t g, uint8_t b);
-void SDL2Display_handle_display_drawInteger(struct SDL2Display_Instance *_instance, uint8_t x, uint8_t y, int16_t v, uint8_t digits, uint8_t scale);
-void SDL2Display_handle_display_clear(struct SDL2Display_Instance *_instance);
-void SDL2Display_handle_display_destroy(struct SDL2Display_Instance *_instance);
 void SDL2Display_handle_display_setBGColor(struct SDL2Display_Instance *_instance, uint8_t r, uint8_t g, uint8_t b);
-void SDL2Display_handle_display_fillRect(struct SDL2Display_Instance *_instance, uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 void SDL2Display_handle_display_create(struct SDL2Display_Instance *_instance, uint8_t xsize, uint8_t ysize);
 void SDL2Display_handle_display_drawRect(struct SDL2Display_Instance *_instance, uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+void SDL2Display_handle_display_destroy(struct SDL2Display_Instance *_instance);
+void SDL2Display_handle_display_drawInteger(struct SDL2Display_Instance *_instance, uint8_t x, uint8_t y, int16_t v, uint8_t digits, uint8_t scale);
+void SDL2Display_handle_display_fillRect(struct SDL2Display_Instance *_instance, uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+void SDL2Display_handle_display_clear(struct SDL2Display_Instance *_instance);
+void SDL2Display_handle_display_setColor(struct SDL2Display_Instance *_instance, uint8_t r, uint8_t g, uint8_t b);
 void SDL2Display_handle_display_update(struct SDL2Display_Instance *_instance);
 // Declaration of callbacks for incoming messages:
 void register_SDL2Display_send_display_displayReady_listener(void (*_listener)(struct SDL2Display_Instance *));

@@ -105,7 +105,7 @@ thing fragment Display includes DisplayMsgs {
 	
 	function clearInteger(x : UInt8, y : UInt8, digits : UInt8, scale:UInt8) do
 		setColor(bg_r, bg_g, bg_b)
-		fillRect(x,y,digits*4*scale, 5*scale)
+		fillRect(x,y,(digits*4-1)*scale, 5*scale)
 		setColor(fg_r, fg_g, fg_b)
 	end
 	

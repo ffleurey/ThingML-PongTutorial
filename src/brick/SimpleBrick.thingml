@@ -30,8 +30,8 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	// Walls around the play area
 	property TOP 	: Int16 = 14 * SCALE 		// Leave 12 pixels on the top for scores
 	property BOTTOM	: Int16 = YMAX + 8 * SCALE	// The bottom wall is off the screen
-	property LEFT	: Int16 = 2 * SCALE			// One pixel for the left wall	
-	property RIGHT	: Int16 = XMAX - 2 * SCALE	// One pixel for the right wall	
+	property LEFT	: Int16 = 1 * SCALE			// One pixel for the left wall	
+	property RIGHT	: Int16 = XMAX - 1 * SCALE	// One pixel for the right wall	
 	
 	// Ball variables
 	property br : Int16 = 3 * SCALE 			// Radius of the ball
@@ -49,11 +49,20 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	property prevBX	: Int16 = -1
 	property prevBY	: Int16 = -1 
 	
+	property bgcolor : UInt8[3]
+	property fgcolor : UInt8[3]
+	function initColors() do
+		bgcolor[0] = 53 	bgcolor[1] = 40 	bgcolor[2] = 120
+		fgcolor[0] = 107 	fgcolor[1] = 94 	fgcolor[2] = 174
+		display!setBGColor(bgcolor[0],bgcolor[1],bgcolor[2])
+		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
+	end
+	
 	function drawBall() do
 		var bs : UInt8 = (br*2)/SCALE 	// Size of the ball on the actual display
 		
 		if (prevBX > 0) do				// Erase the previous ball
-			display!setColor(0,0,0)
+			display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
 			display!fillRect(prevBX, prevBY, bs, bs)
 		end
 		
@@ -61,7 +70,8 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		prevBX = (bx-br)/SCALE
 		prevBY = (by-br)/SCALE
 		
-		display!setColor(255,255,255)
+		//display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
+		display!setColor(183, 199, 111)
 		display!fillRect(prevBX, prevBY, bs, bs)
 	end
 
@@ -74,19 +84,20 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		var ps : UInt8 = padlen/SCALE 	// Size of the pad on the actual display
 	
 		if (prevPX > 0) do				// Erase the previous ball
-			display!setColor(0,0,0)
+			display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
 			display!fillRect(prevPX, prevPY, ps, 4)
 		end
 		
 		prevPX = (padx - (padlen/2)) / SCALE
 		prevPY = pady / SCALE
 		
-		display!setColor(255,255,255)
+		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
+		//display!setColor(255,255,255)
 		display!fillRect(prevPX, prevPY, ps, 4)
 	end
 	
 	function drawWalls() do
-		display!setColor(255,255,255)
+		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
 		display!fillRect(LEFT/SCALE-1, TOP/SCALE-1, (RIGHT-LEFT)/SCALE+1, 1)
 		display!fillRect(LEFT/SCALE-1, BOTTOM/SCALE-1, (RIGHT-LEFT)/SCALE+1, 1)
 		display!fillRect(LEFT/SCALE-1, TOP/SCALE, 1, (BOTTOM-TOP)/SCALE)
@@ -121,16 +132,16 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	function drawBrick(x : UInt8, y: UInt8) do
 		var bx : Int16 = LEFT + ((RIGHT-LEFT)/8) * x
 		var by : Int16 = TOP + 20 * SCALE + BRICK_HEIGHT * y * SCALE
-		display!setColor(100,100,100)
+		display!setColor(155,103,89)
 		display!fillRect(bx/SCALE+1, by/SCALE+1, ((RIGHT-LEFT)/8)/SCALE-2, BRICK_HEIGHT-2)
-		display!setColor(200,200,200)
+		display!setColor(100,56,43)
 		display!drawRect(bx/SCALE+1, by/SCALE+1, ((RIGHT-LEFT)/8)/SCALE-2, BRICK_HEIGHT-2)
 	end
 	
 	function removeBrick(x : UInt8, y: UInt8) do
 		var bx : Int16 = LEFT + ((RIGHT-LEFT)/8) * x
 		var by : Int16 = TOP + 20 * SCALE + BRICK_HEIGHT * y * SCALE
-		display!setColor(0,0,0)
+		display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
 		display!fillRect(bx/SCALE+1, by/SCALE+1, ((RIGHT-LEFT)/8)/SCALE-2, BRICK_HEIGHT-2)
 		bricks[y] = unsetBit(bricks[y], x)
 	end
@@ -148,16 +159,35 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		return result
 	end
 	
+	property score : Int16 = 0
+	function drawScore() do
+		display!setColor(158,209,130)
+		display!drawInteger(98, 2, score, 5, 2)
+	end
+	
+	function drawLives() do
+		display!setColor(183, 199, 111)
+		display!fillRect(22,4,6, 6)
+		display!fillRect(37,4,6, 6)
+		display!fillRect(52,4,6, 6)
+	end
+	
 	statechart SC init INIT {
-		
-		property score : Int16 = 0
 		
 		state INIT {
 			on entry display!create(XDISPSIZE, YDISPSIZE)
 			transition -> PLAY event display?displayReady action do
 				display!clear()
-				display!setBGColor(0,0,0)
-				display!drawInteger(100, 1, score, 5, 2)
+				initColors()
+				display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
+				display!fillRect(0,0,XDISPSIZE, YDISPSIZE)
+				display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
+				display!fillRect(0,0,XDISPSIZE, 1)
+				display!fillRect(0,0,18, 14)
+				display!fillRect(90-28,0,28, 14)
+				display!fillRect(XDISPSIZE-18,0,18, 14)
+				drawScore()
+				drawLives()
 				drawWalls()
 				createBricks()
 			end
@@ -208,8 +238,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 				if (collision) do 
 					dy = -dy // Update the direction of the ball
 					score = score + 10 // Increment score
-					display!setColor(255,255,255)
-					display!drawInteger(100, 1, score, 5, 2)
+					drawScore()
 				end
 				
 				drawBall() // Draw the Ball
