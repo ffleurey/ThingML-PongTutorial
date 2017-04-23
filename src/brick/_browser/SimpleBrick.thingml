@@ -1,7 +1,7 @@
 import "Display_BrowserCanvas.thingml"
 import "../SimpleBrick.thingml"
 import "../Display.thingml"
-import "../DummyController.thingml"
+import "../Controller.thingml"
 import "TimerBrowser.thingml"
 
 thing JavaScriptBrickHacks
