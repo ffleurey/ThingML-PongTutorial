@@ -60,7 +60,7 @@ thing BrowserCanvasDisplay includes Display, ControllerMsgs
       display.style.marginTop = '&-YFRAMESIZE/2*SCALE&'+"px";
       document.body.appendChild(display);
       
-      bufferCtx.lineWidth = 2;
+      //bufferCtx.lineWidth = 2;
       bufferCtx.fillStyle = "rgb(255,0,0)";
       bufferCtx.fillRect(0,0,100,100);
     '
@@ -111,7 +111,10 @@ thing BrowserCanvasDisplay includes Display, ControllerMsgs
       var yr = Math.round('&y&');
       var wr = Math.round('&width&');
       var hr = Math.round('&height&');
-      '&Buffer&'.strokeRect(xr, yr, wr, hr);
+      '&Buffer&'.fillRect(xr, yr, wr, 1);
+      '&Buffer&'.fillRect(xr, yr+hr-1, wr, 1);
+      '&Buffer&'.fillRect(xr, yr, 1, hr);
+      '&Buffer&'.fillRect(xr+wr-1, yr, 1, hr);
     '
   end
   

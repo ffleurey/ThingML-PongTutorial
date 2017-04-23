@@ -273,7 +273,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		state LAUNCH {
 			property countdown : Int8
 			
-			on entry do 
+			on entry do
 				clock!timer_start(0, 33)
 				countdown = 30*3 // 3sec
 				drawScore()
@@ -300,8 +300,11 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		
 		state PLAY {
 
-			on entry clock!timer_start(0, 33)
-			transition -> PLAY event t : clock?timer_timeout guard t.id == 0 action do
+			on entry do
+        clock!timer_start(0, 33)
+      end
+			//transition -> PLAY event t : clock?timer_timeout guard t.id == 1 action do
+      internal event t : clock?timer_timeout guard t.id == 0 action do
 			
 				// Calculate the position of the new ball
 				bx = bx + dx
@@ -316,7 +319,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 				if (bx < wl) 		do	dx = -dx 	bx = 2*wl-bx	end
 				else if (bx > wr)	do	dx = -dx	bx = 2*wr-bx	end
 				if (by < wt)		do	dy = -dy	by = 2*wt-by	end
-				else if (by > wb)	do	
+				else if (by > wb)	do
 					game!lostBall()	
 				end
 				
@@ -345,6 +348,8 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 				drawBall() // Draw the Ball
 				drawPad() // Draw the Pad
 				display!update()
+        
+        clock!timer_start(0, 33)
 			end
 			
 			transition -> LOSTBALL event game?lostBall
@@ -353,7 +358,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		
 		state LOSTBALL {
 
-			on entry do 
+			on entry do
 				clock!timer_start(0, 1000)
 				lives = lives - 1
 				eraseBall()
@@ -371,7 +376,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		
 		state NEXTLEVEL {
 			
-			on entry do 
+			on entry do
 				clock!timer_start(0, 1000)
 				level = level + 1
 				eraseBall()
