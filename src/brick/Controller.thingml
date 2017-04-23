@@ -77,8 +77,15 @@ thing DummyController includes TimerController {
 	
 	statechart SC init Bouncing {
 		
+		on entry do 
+			dx = 10
+			dy = 10
+		end
+		
 		state Bouncing {
-			on entry clock!timer_start(timerID, 50)
+			on entry do 
+				clock!timer_start(timerID, 50)
+			end
 			
 			transition -> Bouncing event e : clock?timer_timeout guard e.id == timerID
 			action do

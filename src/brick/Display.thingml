@@ -109,7 +109,8 @@ thing fragment Display includes DisplayMsgs {
 		setColor(fg_r, fg_g, fg_b)
 	end
 	
-	provided port display {
+	provided port display 
+	{
 		receives create, destroy, update
 		receives clear, setColor, setBGColor, drawRect, fillRect, drawInteger
 		sends displayReady, displayError
@@ -131,7 +132,9 @@ thing fragment Display includes DisplayMsgs {
 		
 		state Running {
 			
-			on entry display!displayReady()
+			on entry do 
+				display!displayReady()
+			end
 			
 			internal event e : display?setColor action do fg_r = e.r fg_g = e.g fg_b= e.b setColor(e.r, e.g, e.b) end 
 			internal event e : display?setBGColor action do bg_r = e.r bg_g = e.g bg_b= e.b end

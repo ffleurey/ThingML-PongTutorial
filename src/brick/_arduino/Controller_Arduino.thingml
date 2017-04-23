@@ -1,0 +1,10 @@
+import "../Controller.thingml"
+
+// Read pots
+
+thing ArduinoController includes Controller, TimerMsgs
+{
+
+	
+}
+

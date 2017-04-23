@@ -71,8 +71,8 @@ SDL_Renderer* renderer = NULL;
 
 		clearScreen()
 		startEventPolling()
-		display!displayReady()
 		updateControl(0)
+		
 	end
 	
 	function destroyDisplay() do

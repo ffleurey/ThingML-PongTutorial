@@ -12,7 +12,9 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		receives timer_timeout
 	}
 
-	required port display {
+	required port display 
+	@sync_send "true"
+	{
 		receives displayReady, displayError
 		sends create, fillRect, drawRect, clear, setColor, setBGColor, drawInteger, update
 	}
@@ -31,9 +33,9 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	readonly property YDISPSIZE : UInt8 = 128
 	
 	// Virtual size of the "game area"
-	readonly property SCALE : UInt16 = 64
-	readonly property XMAX 	: UInt16 = XDISPSIZE * SCALE
-	readonly property YMAX 	: UInt16 = YDISPSIZE * SCALE
+	readonly property SCALE : Int16 = 64
+	readonly property XMAX 	: Int16 = XDISPSIZE * SCALE
+	readonly property YMAX 	: Int16 = YDISPSIZE * SCALE
 	
 	// Walls around the play area
 	property TOP 	: Int16 = 14 * SCALE 		// Leave 12 pixels on the top for scores
@@ -241,12 +243,18 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 		
 		internal event e : controller?position action do
 			// Map the controller values [-100..100] to the pad position
-			var center : Int16 = (RIGHT - LEFT) / 2
-			padx = LEFT + center + (e.x * (RIGHT - LEFT - padlen)) / 200
+			//var center : Int32 = (RIGHT - LEFT) / 2
+			//padx = LEFT + center + (e.x * (RIGHT - LEFT - padlen)) / 200
+			var center : Int32 = (RIGHT - LEFT - padlen)
+			center = e.x * center
+			center = center / 200
+			padx = LEFT + center + (RIGHT - LEFT) / 2 
 		end
 		
 		state INIT {
+			
 			on entry display!create(XDISPSIZE, YDISPSIZE)
+			
 			transition -> LAUNCH event display?displayReady action do
 				display!clear()
 				initColors()
