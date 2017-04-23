@@ -5,7 +5,7 @@ StateJS.internalTransitionsTriggerCompletion = true;
 /**
  * Definition for type : BrowserCanvasDisplay
  **/
-function BrowserCanvasDisplay(name, root, BrowserCanvasDisplay_Buffer_var, BrowserCanvasDisplay_YFRAMESIZE_var, BrowserCanvasDisplay_SCALE_var, BrowserCanvasDisplay_XFRAMESIZE_var, BrowserCanvasDisplay_BufferCanvas_var, BrowserCanvasDisplay_Display_var, debug) {
+function BrowserCanvasDisplay(name, root, BrowserCanvasDisplay_SCALE_var, BrowserCanvasDisplay_Buffer_var, BrowserCanvasDisplay_Display_var, BrowserCanvasDisplay_YFRAMESIZE_var, BrowserCanvasDisplay_BufferCanvas_var, BrowserCanvasDisplay_XFRAMESIZE_var, debug) {
 
 this.name = name;
 this.root = (root === null)? this : root;
@@ -13,18 +13,18 @@ this.debug = debug;
 this.ready = false;
 this.bus = new EventEmitter();
 //Attributes
-this.BrowserCanvasDisplay_Buffer_var = BrowserCanvasDisplay_Buffer_var;
-this.debug_BrowserCanvasDisplay_Buffer_var = BrowserCanvasDisplay_Buffer_var;
-this.BrowserCanvasDisplay_YFRAMESIZE_var = BrowserCanvasDisplay_YFRAMESIZE_var;
-this.debug_BrowserCanvasDisplay_YFRAMESIZE_var = BrowserCanvasDisplay_YFRAMESIZE_var;
 this.BrowserCanvasDisplay_SCALE_var = BrowserCanvasDisplay_SCALE_var;
 this.debug_BrowserCanvasDisplay_SCALE_var = BrowserCanvasDisplay_SCALE_var;
-this.BrowserCanvasDisplay_XFRAMESIZE_var = BrowserCanvasDisplay_XFRAMESIZE_var;
-this.debug_BrowserCanvasDisplay_XFRAMESIZE_var = BrowserCanvasDisplay_XFRAMESIZE_var;
-this.BrowserCanvasDisplay_BufferCanvas_var = BrowserCanvasDisplay_BufferCanvas_var;
-this.debug_BrowserCanvasDisplay_BufferCanvas_var = BrowserCanvasDisplay_BufferCanvas_var;
+this.BrowserCanvasDisplay_Buffer_var = BrowserCanvasDisplay_Buffer_var;
+this.debug_BrowserCanvasDisplay_Buffer_var = BrowserCanvasDisplay_Buffer_var;
 this.BrowserCanvasDisplay_Display_var = BrowserCanvasDisplay_Display_var;
 this.debug_BrowserCanvasDisplay_Display_var = BrowserCanvasDisplay_Display_var;
+this.BrowserCanvasDisplay_YFRAMESIZE_var = BrowserCanvasDisplay_YFRAMESIZE_var;
+this.debug_BrowserCanvasDisplay_YFRAMESIZE_var = BrowserCanvasDisplay_YFRAMESIZE_var;
+this.BrowserCanvasDisplay_BufferCanvas_var = BrowserCanvasDisplay_BufferCanvas_var;
+this.debug_BrowserCanvasDisplay_BufferCanvas_var = BrowserCanvasDisplay_BufferCanvas_var;
+this.BrowserCanvasDisplay_XFRAMESIZE_var = BrowserCanvasDisplay_XFRAMESIZE_var;
+this.debug_BrowserCanvasDisplay_XFRAMESIZE_var = BrowserCanvasDisplay_XFRAMESIZE_var;
 this.build(name);
 }
 //State machine (states and regions)
@@ -37,29 +37,26 @@ this.bus.emit('display?displayReady');
 });
 let Display_SC_Destroyed = new StateJS.State('Destroyed', this.statemachine);
 this._initial_Display_SC.to(Display_SC_Wait);
-Display_SC_Wait.to(Display_SC_Running).when((create) => {return create._port === 'display' && create._msg === 'create';}).effect((create) => {
-this.initDisplay(create.xsize, create.ysize);
-});
-Display_SC_Running.to(null).when((drawRect) => {return drawRect._port === 'display' && drawRect._msg === 'drawRect';}).effect((drawRect) => {
-this.drawRect(drawRect.x, drawRect.y, drawRect.width, drawRect.height);
-});
 Display_SC_Running.to(Display_SC_Destroyed).when((destroy) => {return destroy._port === 'display' && destroy._msg === 'destroy';}).effect((destroy) => {
 this.destroyDisplay();
 });
 Display_SC_Running.to(null).when((drawInteger) => {return drawInteger._port === 'display' && drawInteger._msg === 'drawInteger';}).effect((drawInteger) => {
 this.drawInteger(drawInteger.x, drawInteger.y, drawInteger.v, drawInteger.digits, drawInteger.scale);
 });
-Display_SC_Running.to(null).when((setColor) => {return setColor._port === 'display' && setColor._msg === 'setColor';}).effect((setColor) => {
-this.Display_fg_r_var = setColor.r;
-this.bus.emit('fg_r=', this.Display_fg_r_var);
-this.Display_fg_g_var = setColor.g;
-this.bus.emit('fg_g=', this.Display_fg_g_var);
-this.Display_fg_b_var = setColor.b;
-this.bus.emit('fg_b=', this.Display_fg_b_var);
-this.setColor(setColor.r, setColor.g, setColor.b);
+Display_SC_Running.to(null).when((clear) => {return clear._port === 'display' && clear._msg === 'clear';}).effect((clear) => {
+this.clearScreen();
+});
+Display_SC_Running.to(null).when((drawRect) => {return drawRect._port === 'display' && drawRect._msg === 'drawRect';}).effect((drawRect) => {
+this.drawRect(drawRect.x, drawRect.y, drawRect.width, drawRect.height);
 });
 Display_SC_Running.to(null).when((fillRect) => {return fillRect._port === 'display' && fillRect._msg === 'fillRect';}).effect((fillRect) => {
 this.fillRect(fillRect.x, fillRect.y, fillRect.width, fillRect.height);
+});
+Display_SC_Wait.to(Display_SC_Running).when((create) => {return create._port === 'display' && create._msg === 'create';}).effect((create) => {
+this.initDisplay(create.xsize, create.ysize);
+});
+Display_SC_Running.to(null).when((update) => {return update._port === 'display' && update._msg === 'update';}).effect((update) => {
+this.updateDisplay();
 });
 Display_SC_Running.to(null).when((setBGColor) => {return setBGColor._port === 'display' && setBGColor._msg === 'setBGColor';}).effect((setBGColor) => {
 this.Display_bg_r_var = setBGColor.r;
@@ -69,11 +66,14 @@ this.bus.emit('bg_g=', this.Display_bg_g_var);
 this.Display_bg_b_var = setBGColor.b;
 this.bus.emit('bg_b=', this.Display_bg_b_var);
 });
-Display_SC_Running.to(null).when((clear) => {return clear._port === 'display' && clear._msg === 'clear';}).effect((clear) => {
-this.clearScreen();
-});
-Display_SC_Running.to(null).when((update) => {return update._port === 'display' && update._msg === 'update';}).effect((update) => {
-this.updateDisplay();
+Display_SC_Running.to(null).when((setColor) => {return setColor._port === 'display' && setColor._msg === 'setColor';}).effect((setColor) => {
+this.Display_fg_r_var = setColor.r;
+this.bus.emit('fg_r=', this.Display_fg_r_var);
+this.Display_fg_g_var = setColor.g;
+this.bus.emit('fg_g=', this.Display_fg_g_var);
+this.Display_fg_b_var = setColor.b;
+this.bus.emit('fg_b=', this.Display_fg_b_var);
+this.setColor(setColor.r, setColor.g, setColor.b);
 });
 }
 //ThingML-defined functions
@@ -120,7 +120,7 @@ this.bus.emit('YFRAMESIZE=', this.BrowserCanvasDisplay_YFRAMESIZE_var);
       display.style.marginTop =  -this.BrowserCanvasDisplay_YFRAMESIZE_var / 2 * this.BrowserCanvasDisplay_SCALE_var+"px";
       document.body.appendChild(display);
       
-      bufferCtx.lineWidth = 2;
+      //bufferCtx.lineWidth = 2;
       bufferCtx.fillStyle = "rgb(255,0,0)";
       bufferCtx.fillRect(0,0,100,100);
     
@@ -173,7 +173,10 @@ BrowserCanvasDisplay.prototype.drawRect = function(BrowserCanvasDisplay_drawRect
       var yr = Math.round(BrowserCanvasDisplay_drawRect_y_var);
       var wr = Math.round(BrowserCanvasDisplay_drawRect_width_var);
       var hr = Math.round(BrowserCanvasDisplay_drawRect_height_var);
-      this.BrowserCanvasDisplay_Buffer_var.strokeRect(xr, yr, wr, hr);
+      this.BrowserCanvasDisplay_Buffer_var.fillRect(xr, yr, wr, 1);
+      this.BrowserCanvasDisplay_Buffer_var.fillRect(xr, yr+hr-1, wr, 1);
+      this.BrowserCanvasDisplay_Buffer_var.fillRect(xr, yr, 1, hr);
+      this.BrowserCanvasDisplay_Buffer_var.fillRect(xr+wr-1, yr, 1, hr);
     
 };
 
@@ -188,18 +191,18 @@ BrowserCanvasDisplay.prototype.fillRect = function(BrowserCanvasDisplay_fillRect
 };
 
 BrowserCanvasDisplay.prototype.drawDigit = function(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_d_var, Display_drawDigit_size_var) {
-if(Display_drawDigit_d_var === 0) {
+if(Display_drawDigit_d_var < 1) {
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var + 2 * Display_drawDigit_size_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 4 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 
 } else {
-if(Display_drawDigit_d_var === 1) {
+if(Display_drawDigit_d_var < 2) {
 this.fillRect(Display_drawDigit_x_var + Display_drawDigit_size_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
 
 } else {
-if(Display_drawDigit_d_var === 2) {
+if(Display_drawDigit_d_var < 3) {
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var * 3, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var + 2 * Display_drawDigit_size_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 3 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 2 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
@@ -207,20 +210,20 @@ this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 2 * Display_dra
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 4 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 
 } else {
-if(Display_drawDigit_d_var === 3) {
+if(Display_drawDigit_d_var < 4) {
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var * 3, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var + 2 * Display_drawDigit_size_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 4 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var + Display_drawDigit_size_var, Display_drawDigit_y_var + 2 * Display_drawDigit_size_var, 2 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 
 } else {
-if(Display_drawDigit_d_var === 4) {
+if(Display_drawDigit_d_var < 5) {
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 3 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 2 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var + 2 * Display_drawDigit_size_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
 
 } else {
-if(Display_drawDigit_d_var === 5) {
+if(Display_drawDigit_d_var < 6) {
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var * 3, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 3 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 2 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
@@ -228,7 +231,7 @@ this.fillRect(Display_drawDigit_x_var + 2 * Display_drawDigit_size_var, Display_
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 4 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 
 } else {
-if(Display_drawDigit_d_var === 6) {
+if(Display_drawDigit_d_var < 7) {
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var * 3, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 2 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
@@ -236,12 +239,12 @@ this.fillRect(Display_drawDigit_x_var + 2 * Display_drawDigit_size_var, Display_
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 4 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 
 } else {
-if(Display_drawDigit_d_var === 7) {
+if(Display_drawDigit_d_var < 8) {
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var + 2 * Display_drawDigit_size_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
 
 } else {
-if(Display_drawDigit_d_var === 8) {
+if(Display_drawDigit_d_var < 9) {
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var + 2 * Display_drawDigit_size_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
@@ -249,14 +252,11 @@ this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 4 * Display_dra
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 2 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 
 } else {
-if(Display_drawDigit_d_var === 9) {
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 3 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var + 2 * Display_drawDigit_size_var, Display_drawDigit_y_var, Display_drawDigit_size_var, 5 * Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 4 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
 this.fillRect(Display_drawDigit_x_var, Display_drawDigit_y_var + 2 * Display_drawDigit_size_var, 3 * Display_drawDigit_size_var, Display_drawDigit_size_var);
-
-}
 
 }
 
@@ -291,7 +291,7 @@ d_var = d_var - 1;
 
 BrowserCanvasDisplay.prototype.clearInteger = function(Display_clearInteger_x_var, Display_clearInteger_y_var, Display_clearInteger_digits_var, Display_clearInteger_scale_var) {
 this.setColor(this.Display_bg_r_var, this.Display_bg_g_var, this.Display_bg_b_var);
-this.fillRect(Display_clearInteger_x_var, Display_clearInteger_y_var, Display_clearInteger_digits_var * 4 * Display_clearInteger_scale_var, 5 * Display_clearInteger_scale_var);
+this.fillRect(Display_clearInteger_x_var, Display_clearInteger_y_var, (Display_clearInteger_digits_var * 4 - 1) * Display_clearInteger_scale_var, 5 * Display_clearInteger_scale_var);
 this.setColor(this.Display_fg_r_var, this.Display_fg_g_var, this.Display_fg_b_var);
 };
 
@@ -356,12 +356,12 @@ this._receive({_port:"display", _msg:"drawInteger", x:x, y:y, v:v, digits:digits
 
 BrowserCanvasDisplay.prototype.toString = function() {
 let result = 'instance ' + this.name + ':' + this.constructor.name + '\n';
-result += '\n\tBuffer = ' + this.BrowserCanvasDisplay_Buffer_var;
-result += '\n\tYFRAMESIZE = ' + this.BrowserCanvasDisplay_YFRAMESIZE_var;
 result += '\n\tSCALE = ' + this.BrowserCanvasDisplay_SCALE_var;
-result += '\n\tXFRAMESIZE = ' + this.BrowserCanvasDisplay_XFRAMESIZE_var;
-result += '\n\tBufferCanvas = ' + this.BrowserCanvasDisplay_BufferCanvas_var;
+result += '\n\tBuffer = ' + this.BrowserCanvasDisplay_Buffer_var;
 result += '\n\tDisplay = ' + this.BrowserCanvasDisplay_Display_var;
+result += '\n\tYFRAMESIZE = ' + this.BrowserCanvasDisplay_YFRAMESIZE_var;
+result += '\n\tBufferCanvas = ' + this.BrowserCanvasDisplay_BufferCanvas_var;
+result += '\n\tXFRAMESIZE = ' + this.BrowserCanvasDisplay_XFRAMESIZE_var;
 result += '';
 return result;
 };

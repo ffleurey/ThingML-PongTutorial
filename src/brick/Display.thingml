@@ -31,59 +31,59 @@ thing fragment Display includes DisplayMsgs {
 	
 	function drawDigit(x: UInt8, y: UInt8, d : UInt8, size : UInt8) do
 //		'printf("->drawDigit x=%d, y=%d, d=%d, size=%d\n", '&x&','&y&','&d&','&size&');'
-		if (d == 0) do
+		if (d < 1) do
 			fillRect(x,y,size, 5*size)
 			fillRect(x,y,3*size, size)
 			fillRect(x+2*size,y,size, 5*size)
 			fillRect(x,y+4*size,3*size, size)
 		end
-		else if (d == 1) do
+		else if (d < 2) do
 			fillRect(x+size,y,size, 5*size)
 		end
-		else if (d == 2) do
+		else if (d < 3) do
 			fillRect(x,y,size*3, size)
 			fillRect(x+2*size,y,size, 3*size)
 			fillRect(x,y+2*size,3*size, size)
 			fillRect(x,y+2*size,size, 3*size)
 			fillRect(x,y+4*size,3*size, size)
 		end
-		else if (d == 3) do
+		else if (d < 4) do
 			fillRect(x,y,size*3, size)
 			fillRect(x+2*size,y,size, 5*size)
 			fillRect(x,y+4*size,3*size, size)
 			fillRect(x+size,y+2*size,2*size, size)
 		end
-		else if (d == 4) do
+		else if (d < 5) do
 			fillRect(x,y,size, 3*size)
 			fillRect(x,y+2*size,3*size, size)
 			fillRect(x+2*size,y,size, 5*size)
 		end
-		else if (d == 5) do
+		else if (d < 6) do
 			fillRect(x,y,size*3, size)
 			fillRect(x,y,size, 3*size)
 			fillRect(x,y+2*size,3*size, size)
 			fillRect(x+2*size,y+2*size,size, 3*size)
 			fillRect(x,y+4*size,3*size, size)
 		end
-		else if (d == 6) do
+		else if (d < 7) do
 			fillRect(x,y,size*3, size)
 			fillRect(x,y,size, 5*size)
 			fillRect(x,y+2*size,3*size, size)
 			fillRect(x+2*size,y+2*size,size, 3*size)
 			fillRect(x,y+4*size,3*size, size)
 		end
-		else if (d == 7) do
+		else if (d < 8) do
 			fillRect(x,y,3*size, size)
 			fillRect(x+2*size,y,size, 5*size)
 		end
-		else if (d == 8) do
+		else if (d < 9) do
 			fillRect(x,y,size, 5*size)
 			fillRect(x,y,3*size, size)
 			fillRect(x+2*size,y,size, 5*size)
 			fillRect(x,y+4*size,3*size, size)
 			fillRect(x,y+2*size,3*size, size)
 		end
-		else if (d == 9) do
+		else do
 			fillRect(x,y,size, 3*size)
 			fillRect(x,y,3*size, size)
 			fillRect(x+2*size,y,size, 5*size)
