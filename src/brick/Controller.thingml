@@ -103,3 +103,38 @@ thing DummyController includes TimerController {
 		}
 	}
 }
+
+thing fragment IAControllerMsg {
+	message updateIA(ballx:Int16, bally: Int16, padx:Int16, pady: Int16)
+	message hitBall()
+	message missBall()
+}
+
+thing fragment IAController includes Controller, IAControllerMsg {
+	required port game {
+		receives updateIA //, hitBall, missBall
+	}
+}
+
+thing BasicIAController includes IAController {
+	
+	property ctrlx : Int16 = 0
+	
+	statechart SC init Following {
+		
+		state Following {
+			
+			on entry controls!position(ctrlx, 0)
+			
+			transition -> Following event e : game?updateIA 
+			action do
+				//'printf("bx=%d, px=%d\n", '&e.ballx&', '&e.padx&');'
+				if (e.ballx > e.padx+300) ctrlx = ctrlx + 4
+				else if (e.ballx < e.padx-300) ctrlx = ctrlx - 4
+				if (ctrlx < -100) ctrlx = -100
+				else if (ctrlx > 100) ctrlx = 100
+			end	
+		}
+	}
+}
+

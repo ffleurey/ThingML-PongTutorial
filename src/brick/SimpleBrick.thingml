@@ -2,7 +2,7 @@ import "_Timer.thingml"
 import "Display.thingml"
 import "Controller.thingml"
 
-thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
+thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerMsg {
 	
 	message lostBall();
 	message nextLevel();
@@ -21,6 +21,11 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 	
 	required port controller {
 		receives position
+	}
+	
+	provided port ia 
+	{
+		sends updateIA , lostBall, hitBall
 	}
 	
 	internal port game {
@@ -321,6 +326,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 				if (by < wt)		do	dy = -dy	by = 2*wt-by	end
 				else if (by > wb)	do
 					game!lostBall()	
+					//ia!lostBall()
 				end
 				
 				// check for collision with the pad
@@ -330,6 +336,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 							dy = -dy 					// Bounce on the pad
 							by = 2*(pady-br)-by			// Adjust the position of the ball
 							dx = dx/4 + (bx-padx)/4		// Adjust horizontal speed
+							//ia!hitBall()
 						end
 					end
 				end
@@ -347,9 +354,10 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs {
 				
 				drawBall() // Draw the Ball
 				drawPad() // Draw the Pad
+				ia!updateIA(bx, by, padx, pady)
 				display!update()
         
-        clock!timer_start(0, 33)
+        		clock!timer_start(0, 33)
 			end
 			
 			transition -> LOSTBALL event game?lostBall

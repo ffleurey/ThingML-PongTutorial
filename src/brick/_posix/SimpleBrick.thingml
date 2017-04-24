@@ -12,12 +12,13 @@ configuration SimpleBrickSDL2
 {
 	instance bb : SimpleBrick
 	instance disp : SDL2Display
-	instance ctrl : DummyController
+	instance ctrl : BasicIAController
 	
 	connector bb.clock over Timer
-	connector ctrl.clock over Timer
+	//connector ctrl.clock over Timer
 	
 	connector bb.display => disp.display
 	connector bb.controller => disp.controls
 	connector bb.controller => ctrl.controls
+	connector ctrl.game => bb.ia 
 }
