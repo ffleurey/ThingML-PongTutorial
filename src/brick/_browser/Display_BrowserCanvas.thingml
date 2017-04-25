@@ -123,10 +123,10 @@ thing BrowserCanvasDisplay includes Display, ControllerMsgs
   
 	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
     '
-      var xr = Math.round('&x&');
-      var yr = Math.round('&y&');
-      var wr = Math.round('&width&');
-      var hr = Math.round('&height&');
+      var xr = Math.floor('&x&');
+      var yr = Math.floor('&y&');
+      var wr = Math.floor('&width&');
+      var hr = Math.floor('&height&');
       '&Buffer&'.fillRect(xr, yr, wr, 1);
       '&Buffer&'.fillRect(xr, yr+hr-1, wr, 1);
       '&Buffer&'.fillRect(xr, yr, 1, hr);
@@ -136,10 +136,10 @@ thing BrowserCanvasDisplay includes Display, ControllerMsgs
   
 	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
     '
-      var xr = Math.round('&x&');
-      var yr = Math.round('&y&');
-      var wr = Math.round('&width&');
-      var hr = Math.round('&height&');
+      var xr = Math.floor('&x&');
+      var yr = Math.floor('&y&');
+      var wr = Math.floor('&width&');
+      var hr = Math.floor('&height&');
       '&Buffer&'.fillRect(xr, yr, wr, hr);
     '
   end
