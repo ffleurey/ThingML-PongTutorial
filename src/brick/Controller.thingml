@@ -71,6 +71,12 @@ thing VelocityController includes TimerController {
         posX = e.x
         posY = e.y
         
+        if (posX < XMIN) posX = XMIN
+		else if (posX > XMAX) posX = XMAX
+		
+		if (posY < YMIN) posY=YMIN
+		else if (posY > YMAX) 	posY=YMAX
+        
         controls!position(posX, posY)
       end
 		}

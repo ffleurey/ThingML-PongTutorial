@@ -14,13 +14,15 @@ thing TimerJava includes TimerMsgs
 	}
 
     function startTimer(id: Integer, delay : Integer) do
+    
+    	//if (id == 0) 'System.out.println("StartTimer " + '&id&' + ", " + '&delay&');'
+    	cancel(id)
         'final int t_id = '&id&';'
-        'TimerTask t = tasks.get(t_id);'
-        'if (t == null) t = new TimerTask() { public void run(){' 
+        'TimerTask t =  new TimerTask() { public void run(){' 
         	timer!timer_timeout('t_id') '
-        } };'
-        'else ' cancel(id)
-        'timer.schedule(t, ' & delay & ');'
+        } };
+        tasks.put(t_id, t);
+        timer.schedule(t, ' & delay & ');'
     end
 
     function cancel(id: Integer) do
