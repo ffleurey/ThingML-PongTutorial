@@ -1,0 +1,46 @@
+import "../lib/_Timer.thingml"
+
+// Manage a set of software timers.
+thing TimerJava includes TimerMsgs
+@java_import "import java.util.*;"
+@java_features "
+	Hashtable<Integer, TimerTask> tasks = new Hashtable<Integer, TimerTask>();
+	Timer timer = new java.util.Timer();"
+{
+	
+	provided port timer {
+		receives timer_start, timer_cancel
+		sends timer_timeout
+	}
+
+    function startTimer(id: Integer, delay : Integer) do
+    
+    	//if (id == 0) 'System.out.println("StartTimer " + '&id&' + ", " + '&delay&');'
+    	cancel(id)
+        'final int t_id = '&id&';'
+        'TimerTask t =  new TimerTask() { public void run(){' 
+        	timer!timer_timeout('t_id') '
+        } };
+        tasks.put(t_id, t);
+        timer.schedule(t, ' & delay & ');'
+    end
+
+    function cancel(id: Integer) do
+    	'TimerTask t = tasks.get('&id&');'
+        'if (t != null) t.cancel();'
+        'timer.purge();'
+    end
+
+    statechart SoftTimer init default {
+        state default {
+
+          internal event m : timer?timer_start
+            guard m.time > 0
+            action startTimer(m.id, m.time)
+
+          internal cancel
+            event m : timer?timer_cancel
+            action cancel(m.id)
+        }
+    }
+}

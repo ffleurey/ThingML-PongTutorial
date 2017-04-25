@@ -1,0 +1,161 @@
+import "../Display.thingml"
+import "../Controller.thingml"
+
+thing DisplayJava includes Display, ControllerMsgs 
+	
+@java_import "
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import javax.swing.*;
+import java.awt.event.*;"
+
+@java_features "
+	protected JPanel canevas;
+	protected JFrame frame;
+	protected Graphics2D g2d;
+	
+	// Cache the colors which have been already created
+	protected Hashtable<String, Color> colors = new Hashtable<String, Color>();
+	protected Color getColor(int r, int g, int b) {
+		String key = new String() + r + ';' + g + ';' +  b;
+		if (colors.containsKey(key)) return colors.get(key);
+		else {
+			Color c = new Color(r,g,b);
+			colors.put(key, c);
+			return c;
+		}
+	}"
+{
+	
+	readonly property SCALE 	: UInt8 = 5
+	
+	property XFRAMESIZE : Int16
+	property YFRAMESIZE : Int16
+	
+	
+	provided port vctrl {
+		sends fire, velocity, position
+	}
+	
+	function initDisplay(xsize : UInt8, ysize : UInt8) do
+		XFRAMESIZE = xsize
+		YFRAMESIZE = ysize
+		'
+		final BufferedImage displayBuffer = new BufferedImage('&XFRAMESIZE&', '&YFRAMESIZE&', BufferedImage.TYPE_INT_ARGB);
+		g2d = displayBuffer.createGraphics();
+		
+		canevas = new JPanel() {
+			  private static final long serialVersionUID = 1L;
+			  public void update(Graphics g) {
+				  paint(g);
+			  }
+			
+			  public void paint(Graphics g) {
+				  g.drawImage(displayBuffer, 0, 0, '&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&', 0, 0, '&XFRAMESIZE&', '&YFRAMESIZE&', null);
+			  }
+		};
+		//canevas.setSize(new Dimension('&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&'));
+		canevas.setPreferredSize(new Dimension('&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&'));
+		
+		frame = new JFrame("ThingML Java2D Display") {
+            private static final long serialVersionUID = 1L;
+            public void processWindowEvent(java.awt.event.WindowEvent e) {
+                super.processWindowEvent(e);
+                if (e.getID() == java.awt.event.WindowEvent.WINDOW_CLOSING) {
+                    System.exit(0);
+                }
+              }
+        };
+        
+        frame.setBackground(Color.black);
+      
+        frame.add(canevas);
+        frame.pack();
+        //frame.setResizable(false);
+        
+        canevas.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {}
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            	int keyCode = e.getKeyCode();
+			    switch( keyCode ) { 
+			        case KeyEvent.VK_LEFT:
+			            'vctrl!velocity(0,0)'
+			            break;
+			        case KeyEvent.VK_RIGHT :
+			            'vctrl!velocity(0,0)'
+			            break;
+			     }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int keyCode = e.getKeyCode();
+			    switch( keyCode ) { 
+			        case KeyEvent.VK_LEFT:
+			            'vctrl!velocity(-8,0)'
+			            break;
+			        case KeyEvent.VK_RIGHT :
+			            'vctrl!velocity(8,0)'
+			            break;
+			     }
+            }
+        });
+        
+        canevas.addMouseMotionListener(new MouseMotionListener() {
+
+            @Override
+            public void mouseDragged(MouseEvent e) {}
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+            	'updatePosition('e.getX()')'
+            }
+        });
+        
+        canevas.setFocusable(true);
+        canevas.requestFocusInWindow();
+        
+        frame.setVisible(true);
+        
+        canevas.repaint();'
+	end
+	
+	function updatePosition(mousex : Integer) do
+	 vctrl!position(((mousex/SCALE - XFRAMESIZE/2)*220) / XFRAMESIZE, 0)
+	end
+	
+	
+	function destroyDisplay() do
+		'frame.setVisible(false);
+		frame.dispose();'
+	end
+	
+	function clearScreen() do 
+        'g2d.clearRect(0, 0, '&XFRAMESIZE&', '&YFRAMESIZE&');'
+	end
+	
+	function setColor(r : UInt8, g : UInt8, b : UInt8) do
+		'g2d.setColor(getColor('&r&','&g&','&b&'));'
+	end 
+	
+	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+		'g2d.drawRect('&x&','&y&','&width-1&','&height-1&');'
+	end
+	
+	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
+		'g2d.fillRect('&x&','&y&','&width&','&height&');'
+	end
+	
+	function updateDisplay() do
+		'canevas.repaint();'
+	end
+	
+}

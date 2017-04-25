@@ -1,0 +1,20 @@
+import "DisplayJava.thingml"
+import "../BreakoutGame.thingml"
+import "TimerJava.thingml"
+
+configuration BreakoutJava 
+{
+	instance game : BreakoutGame
+	instance disp : DisplayJava 
+	instance ctrl : VelocityController
+	instance timer : TimerJava
+	
+	connector game.clock => timer.timer
+    connector ctrl.clock => timer.timer
+    
+	connector game.display => disp.display
+	connector game.controller => ctrl.controls
+	
+	connector ctrl.ctrl_in => disp.vctrl
+
+}  

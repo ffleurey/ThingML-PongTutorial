@@ -1,0 +1,9 @@
+import "../Controller.thingml"
+
+// Read a pot via ADC and/or read the buttons on the display shield
+
+thing ControllerArduino includes Controller, TimerMsgs
+{
+	//TODO
+}
+
