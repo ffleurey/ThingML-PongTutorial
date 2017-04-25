@@ -5,7 +5,7 @@ StateJS.internalTransitionsTriggerCompletion = true;
 /**
  * Definition for type : BrowserCanvasDisplay
  **/
-function BrowserCanvasDisplay(name, root, BrowserCanvasDisplay_XFRAMESIZE_var, BrowserCanvasDisplay_YFRAMESIZE_var, BrowserCanvasDisplay_BufferCanvas_var, BrowserCanvasDisplay_SCALE_var, BrowserCanvasDisplay_Buffer_var, BrowserCanvasDisplay_Display_var, debug) {
+function BrowserCanvasDisplay(name, root, BrowserCanvasDisplay_YFRAMESIZE_var, BrowserCanvasDisplay_Display_var, BrowserCanvasDisplay_SCALE_var, BrowserCanvasDisplay_XFRAMESIZE_var, BrowserCanvasDisplay_Buffer_var, BrowserCanvasDisplay_BufferCanvas_var, debug) {
 
 this.name = name;
 this.root = (root === null)? this : root;
@@ -13,18 +13,18 @@ this.debug = debug;
 this.ready = false;
 this.bus = new EventEmitter();
 //Attributes
-this.BrowserCanvasDisplay_XFRAMESIZE_var = BrowserCanvasDisplay_XFRAMESIZE_var;
-this.debug_BrowserCanvasDisplay_XFRAMESIZE_var = BrowserCanvasDisplay_XFRAMESIZE_var;
 this.BrowserCanvasDisplay_YFRAMESIZE_var = BrowserCanvasDisplay_YFRAMESIZE_var;
 this.debug_BrowserCanvasDisplay_YFRAMESIZE_var = BrowserCanvasDisplay_YFRAMESIZE_var;
-this.BrowserCanvasDisplay_BufferCanvas_var = BrowserCanvasDisplay_BufferCanvas_var;
-this.debug_BrowserCanvasDisplay_BufferCanvas_var = BrowserCanvasDisplay_BufferCanvas_var;
-this.BrowserCanvasDisplay_SCALE_var = BrowserCanvasDisplay_SCALE_var;
-this.debug_BrowserCanvasDisplay_SCALE_var = BrowserCanvasDisplay_SCALE_var;
-this.BrowserCanvasDisplay_Buffer_var = BrowserCanvasDisplay_Buffer_var;
-this.debug_BrowserCanvasDisplay_Buffer_var = BrowserCanvasDisplay_Buffer_var;
 this.BrowserCanvasDisplay_Display_var = BrowserCanvasDisplay_Display_var;
 this.debug_BrowserCanvasDisplay_Display_var = BrowserCanvasDisplay_Display_var;
+this.BrowserCanvasDisplay_SCALE_var = BrowserCanvasDisplay_SCALE_var;
+this.debug_BrowserCanvasDisplay_SCALE_var = BrowserCanvasDisplay_SCALE_var;
+this.BrowserCanvasDisplay_XFRAMESIZE_var = BrowserCanvasDisplay_XFRAMESIZE_var;
+this.debug_BrowserCanvasDisplay_XFRAMESIZE_var = BrowserCanvasDisplay_XFRAMESIZE_var;
+this.BrowserCanvasDisplay_Buffer_var = BrowserCanvasDisplay_Buffer_var;
+this.debug_BrowserCanvasDisplay_Buffer_var = BrowserCanvasDisplay_Buffer_var;
+this.BrowserCanvasDisplay_BufferCanvas_var = BrowserCanvasDisplay_BufferCanvas_var;
+this.debug_BrowserCanvasDisplay_BufferCanvas_var = BrowserCanvasDisplay_BufferCanvas_var;
 this.build(name);
 }
 //State machine (states and regions)
@@ -33,28 +33,10 @@ this.statemachine = new StateJS.StateMachine('SC');
 this._initial_Display_SC = new StateJS.PseudoState('_initial', this.statemachine, StateJS.PseudoStateKind.Initial);
 let Display_SC_Wait = new StateJS.State('Wait', this.statemachine);
 let Display_SC_Running = new StateJS.State('Running', this.statemachine).entry(() => {
-this.bus.emit('display?displayReady');
+setTimeout(() => this.bus.emit('display?displayReady'), 0);
 });
 let Display_SC_Destroyed = new StateJS.State('Destroyed', this.statemachine);
 this._initial_Display_SC.to(Display_SC_Wait);
-Display_SC_Running.to(null).when((fillRect) => {return fillRect._port === 'display' && fillRect._msg === 'fillRect';}).effect((fillRect) => {
-this.fillRect(fillRect.x, fillRect.y, fillRect.width, fillRect.height);
-});
-Display_SC_Running.to(null).when((clear) => {return clear._port === 'display' && clear._msg === 'clear';}).effect((clear) => {
-this.clearScreen();
-});
-Display_SC_Running.to(null).when((drawRect) => {return drawRect._port === 'display' && drawRect._msg === 'drawRect';}).effect((drawRect) => {
-this.drawRect(drawRect.x, drawRect.y, drawRect.width, drawRect.height);
-});
-Display_SC_Wait.to(Display_SC_Running).when((create) => {return create._port === 'display' && create._msg === 'create';}).effect((create) => {
-this.initDisplay(create.xsize, create.ysize);
-});
-Display_SC_Running.to(null).when((update) => {return update._port === 'display' && update._msg === 'update';}).effect((update) => {
-this.updateDisplay();
-});
-Display_SC_Running.to(Display_SC_Destroyed).when((destroy) => {return destroy._port === 'display' && destroy._msg === 'destroy';}).effect((destroy) => {
-this.destroyDisplay();
-});
 Display_SC_Running.to(null).when((setColor) => {return setColor._port === 'display' && setColor._msg === 'setColor';}).effect((setColor) => {
 this.Display_fg_r_var = setColor.r;
 this.bus.emit('fg_r=', this.Display_fg_r_var);
@@ -64,6 +46,24 @@ this.Display_fg_b_var = setColor.b;
 this.bus.emit('fg_b=', this.Display_fg_b_var);
 this.setColor(setColor.r, setColor.g, setColor.b);
 });
+Display_SC_Running.to(null).when((clear) => {return clear._port === 'display' && clear._msg === 'clear';}).effect((clear) => {
+this.clearScreen();
+});
+Display_SC_Running.to(null).when((drawRect) => {return drawRect._port === 'display' && drawRect._msg === 'drawRect';}).effect((drawRect) => {
+this.drawRect(drawRect.x, drawRect.y, drawRect.width, drawRect.height);
+});
+Display_SC_Running.to(null).when((drawInteger) => {return drawInteger._port === 'display' && drawInteger._msg === 'drawInteger';}).effect((drawInteger) => {
+this.drawInteger(drawInteger.x, drawInteger.y, drawInteger.v, drawInteger.digits, drawInteger.scale);
+});
+Display_SC_Running.to(null).when((update) => {return update._port === 'display' && update._msg === 'update';}).effect((update) => {
+this.updateDisplay();
+});
+Display_SC_Running.to(null).when((fillRect) => {return fillRect._port === 'display' && fillRect._msg === 'fillRect';}).effect((fillRect) => {
+this.fillRect(fillRect.x, fillRect.y, fillRect.width, fillRect.height);
+});
+Display_SC_Running.to(Display_SC_Destroyed).when((destroy) => {return destroy._port === 'display' && destroy._msg === 'destroy';}).effect((destroy) => {
+this.destroyDisplay();
+});
 Display_SC_Running.to(null).when((setBGColor) => {return setBGColor._port === 'display' && setBGColor._msg === 'setBGColor';}).effect((setBGColor) => {
 this.Display_bg_r_var = setBGColor.r;
 this.bus.emit('bg_r=', this.Display_bg_r_var);
@@ -72,8 +72,8 @@ this.bus.emit('bg_g=', this.Display_bg_g_var);
 this.Display_bg_b_var = setBGColor.b;
 this.bus.emit('bg_b=', this.Display_bg_b_var);
 });
-Display_SC_Running.to(null).when((drawInteger) => {return drawInteger._port === 'display' && drawInteger._msg === 'drawInteger';}).effect((drawInteger) => {
-this.drawInteger(drawInteger.x, drawInteger.y, drawInteger.v, drawInteger.digits, drawInteger.scale);
+Display_SC_Wait.to(Display_SC_Running).when((create) => {return create._port === 'display' && create._msg === 'create';}).effect((create) => {
+this.initDisplay(create.xsize, create.ysize);
 });
 }
 //ThingML-defined functions
@@ -116,8 +116,8 @@ this.bus.emit('YFRAMESIZE=', this.BrowserCanvasDisplay_YFRAMESIZE_var);
       display.style.position = "absolute";
       display.style.left = "50%";
       display.style.top = "50%";
-      display.style.marginLeft =  -this.BrowserCanvasDisplay_XFRAMESIZE_var / 2 * this.BrowserCanvasDisplay_SCALE_var+"px";
-      display.style.marginTop =  -this.BrowserCanvasDisplay_YFRAMESIZE_var / 2 * this.BrowserCanvasDisplay_SCALE_var+"px";
+      display.style.marginLeft = Math.floor( -this.BrowserCanvasDisplay_XFRAMESIZE_var / 2) * this.BrowserCanvasDisplay_SCALE_var+"px";
+      display.style.marginTop = Math.floor( -this.BrowserCanvasDisplay_YFRAMESIZE_var / 2) * this.BrowserCanvasDisplay_SCALE_var+"px";
       display.style.cursor = "none";
       document.body.appendChild(display);
       
@@ -131,7 +131,7 @@ this.bus.emit('YFRAMESIZE=', this.BrowserCanvasDisplay_YFRAMESIZE_var);
         posX = Math.max(-100, Math.min(100, posX));
         
         
-this.bus.emit('vctrl?position', posX, 0);
+setTimeout(() => this.bus.emit('vctrl?position', posX, 0), 0);
 
       });
     
@@ -140,18 +140,18 @@ this.clearScreen();
       document.addEventListener("keydown", (e) => {
         if (e.key == "ArrowLeft") {
           
-this.bus.emit('vctrl?velocity',  -8, 0);
+setTimeout(() => this.bus.emit('vctrl?velocity',  -8, 0), 0);
 
         } else if (e.key == "ArrowRight") {
           
-this.bus.emit('vctrl?velocity', 8, 0);
+setTimeout(() => this.bus.emit('vctrl?velocity', 8, 0), 0);
 
         }
       });
       document.addEventListener("keyup", (e) => {
         if (e.key == "ArrowLeft" || e.key == "ArrowRight") {
           
-this.bus.emit('vctrl?velocity', 0, 0);
+setTimeout(() => this.bus.emit('vctrl?velocity', 0, 0), 0);
 
         }
       });
@@ -159,7 +159,7 @@ this.bus.emit('vctrl?velocity', 0, 0);
 
       window.setPadPosition = (x) => { //[-100, 100]
         
-this.bus.emit('vctrl?position', x, 0);
+setTimeout(() => this.bus.emit('vctrl?position', x, 0), 0);
 
       };
     
@@ -301,7 +301,7 @@ let val_var = Display_drawInteger_v_var;
 let d_var = Display_drawInteger_digits_var;
 while(d_var > 0) {
 this.drawDigit(Display_drawInteger_x_var + (d_var - 1) * 4 * Display_drawInteger_scale_var, Display_drawInteger_y_var, val_var % 10, Display_drawInteger_scale_var);
-val_var = val_var / 10;
+val_var = Math.floor(val_var / 10);
 d_var = d_var - 1;
 
 }
@@ -374,12 +374,12 @@ this._receive({_port:"display", _msg:"drawInteger", x:x, y:y, v:v, digits:digits
 
 BrowserCanvasDisplay.prototype.toString = function() {
 let result = 'instance ' + this.name + ':' + this.constructor.name + '\n';
-result += '\n\tXFRAMESIZE = ' + this.BrowserCanvasDisplay_XFRAMESIZE_var;
 result += '\n\tYFRAMESIZE = ' + this.BrowserCanvasDisplay_YFRAMESIZE_var;
-result += '\n\tBufferCanvas = ' + this.BrowserCanvasDisplay_BufferCanvas_var;
-result += '\n\tSCALE = ' + this.BrowserCanvasDisplay_SCALE_var;
-result += '\n\tBuffer = ' + this.BrowserCanvasDisplay_Buffer_var;
 result += '\n\tDisplay = ' + this.BrowserCanvasDisplay_Display_var;
+result += '\n\tSCALE = ' + this.BrowserCanvasDisplay_SCALE_var;
+result += '\n\tXFRAMESIZE = ' + this.BrowserCanvasDisplay_XFRAMESIZE_var;
+result += '\n\tBuffer = ' + this.BrowserCanvasDisplay_Buffer_var;
+result += '\n\tBufferCanvas = ' + this.BrowserCanvasDisplay_BufferCanvas_var;
 result += '';
 return result;
 };

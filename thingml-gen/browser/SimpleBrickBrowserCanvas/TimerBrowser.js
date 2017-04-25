@@ -23,11 +23,11 @@ this.statemachine = new StateJS.StateMachine('SoftTimer');
 this._initial_TimerBrowser_SoftTimer = new StateJS.PseudoState('_initial', this.statemachine, StateJS.PseudoStateKind.Initial);
 let TimerBrowser_SoftTimer_default = new StateJS.State('default', this.statemachine);
 this._initial_TimerBrowser_SoftTimer.to(TimerBrowser_SoftTimer_default);
-TimerBrowser_SoftTimer_default.to(null).when((timer_start) => {return timer_start._port === 'timer' && timer_start._msg === 'timer_start' && timer_start.time > 0;}).effect((timer_start) => {
-this.startTimer(timer_start.id, timer_start.time);
-});
 TimerBrowser_SoftTimer_default.to(null).when((timer_cancel) => {return timer_cancel._port === 'timer' && timer_cancel._msg === 'timer_cancel';}).effect((timer_cancel) => {
 this.cancel(timer_cancel.id);
+});
+TimerBrowser_SoftTimer_default.to(null).when((timer_start) => {return timer_start._port === 'timer' && timer_start._msg === 'timer_start' && timer_start.time > 0;}).effect((timer_start) => {
+this.startTimer(timer_start.id, timer_start.time);
 });
 }
 //ThingML-defined functions
@@ -41,7 +41,7 @@ this.cancel(TimerBrowser_startTimer_id_var);
       
       this.TimerBrowser_Timeouts_var[TimerBrowser_startTimer_id_var] = setTimeout(() => {
         
-this.bus.emit('timer?timer_timeout', TimerBrowser_startTimer_id_var);
+setTimeout(() => this.bus.emit('timer?timer_timeout', TimerBrowser_startTimer_id_var), 0);
 
         this.TimerBrowser_Timeouts_var[TimerBrowser_startTimer_id_var] = undefined;
       }, TimerBrowser_startTimer_delay_var);

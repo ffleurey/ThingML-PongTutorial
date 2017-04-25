@@ -5,7 +5,7 @@ StateJS.internalTransitionsTriggerCompletion = true;
 /**
  * Definition for type : VelocityController
  **/
-function VelocityController(name, root, TimerController_dy_var, TimerController_YMAX_var, TimerController_posY_var, TimerController_dx_var, TimerController_posX_var, TimerController_YMIN_var, TimerController_XMAX_var, VelocityController_timerID_var, TimerController_XMIN_var, debug) {
+function VelocityController(name, root, TimerController_YMAX_var, TimerController_XMIN_var, VelocityController_timerID_var, TimerController_dy_var, TimerController_posX_var, TimerController_posY_var, TimerController_XMAX_var, TimerController_YMIN_var, TimerController_dx_var, debug) {
 
 this.name = name;
 this.root = (root === null)? this : root;
@@ -13,24 +13,24 @@ this.debug = debug;
 this.ready = false;
 this.bus = new EventEmitter();
 //Attributes
-this.TimerController_dy_var = TimerController_dy_var;
-this.debug_TimerController_dy_var = TimerController_dy_var;
 this.TimerController_YMAX_var = TimerController_YMAX_var;
 this.debug_TimerController_YMAX_var = TimerController_YMAX_var;
-this.TimerController_posY_var = TimerController_posY_var;
-this.debug_TimerController_posY_var = TimerController_posY_var;
-this.TimerController_dx_var = TimerController_dx_var;
-this.debug_TimerController_dx_var = TimerController_dx_var;
-this.TimerController_posX_var = TimerController_posX_var;
-this.debug_TimerController_posX_var = TimerController_posX_var;
-this.TimerController_YMIN_var = TimerController_YMIN_var;
-this.debug_TimerController_YMIN_var = TimerController_YMIN_var;
-this.TimerController_XMAX_var = TimerController_XMAX_var;
-this.debug_TimerController_XMAX_var = TimerController_XMAX_var;
-this.VelocityController_timerID_var = VelocityController_timerID_var;
-this.debug_VelocityController_timerID_var = VelocityController_timerID_var;
 this.TimerController_XMIN_var = TimerController_XMIN_var;
 this.debug_TimerController_XMIN_var = TimerController_XMIN_var;
+this.VelocityController_timerID_var = VelocityController_timerID_var;
+this.debug_VelocityController_timerID_var = VelocityController_timerID_var;
+this.TimerController_dy_var = TimerController_dy_var;
+this.debug_TimerController_dy_var = TimerController_dy_var;
+this.TimerController_posX_var = TimerController_posX_var;
+this.debug_TimerController_posX_var = TimerController_posX_var;
+this.TimerController_posY_var = TimerController_posY_var;
+this.debug_TimerController_posY_var = TimerController_posY_var;
+this.TimerController_XMAX_var = TimerController_XMAX_var;
+this.debug_TimerController_XMAX_var = TimerController_XMAX_var;
+this.TimerController_YMIN_var = TimerController_YMIN_var;
+this.debug_TimerController_YMIN_var = TimerController_YMIN_var;
+this.TimerController_dx_var = TimerController_dx_var;
+this.debug_TimerController_dx_var = TimerController_dx_var;
 this.build(name);
 }
 //State machine (states and regions)
@@ -38,7 +38,7 @@ VelocityController.prototype.build = function(session) {//optional session name 
 this.statemachine = new StateJS.StateMachine('SC');
 this._initial_VelocityController_SC = new StateJS.PseudoState('_initial', this.statemachine, StateJS.PseudoStateKind.Initial);
 let VelocityController_SC_Running = new StateJS.State('Running', this.statemachine).entry(() => {
-this.bus.emit('clock?timer_start', this.VelocityController_timerID_var, 50);
+setTimeout(() => this.bus.emit('clock?timer_start', this.VelocityController_timerID_var, 50), 0);
 });
 this._initial_VelocityController_SC.to(VelocityController_SC_Running);
 VelocityController_SC_Running.to(null).when((position) => {return position._port === 'ctrl_in' && position._msg === 'position';}).effect((position) => {
@@ -46,16 +46,16 @@ this.TimerController_posX_var = position.x;
 this.bus.emit('posX=', this.TimerController_posX_var);
 this.TimerController_posY_var = position.y;
 this.bus.emit('posY=', this.TimerController_posY_var);
-this.bus.emit('controls?position', this.TimerController_posX_var, this.TimerController_posY_var);
-});
-this.statemachine.to(null).when((fire) => {return fire._port === 'ctrl_in' && fire._msg === 'fire';}).effect((fire) => {
-this.bus.emit('controls?fire', fire.id);
+setTimeout(() => this.bus.emit('controls?position', this.TimerController_posX_var, this.TimerController_posY_var), 0);
 });
 this.statemachine.to(null).when((velocity) => {return velocity._port === 'ctrl_in' && velocity._msg === 'velocity';}).effect((velocity) => {
 this.TimerController_dx_var = velocity.dx;
 this.bus.emit('dx=', this.TimerController_dx_var);
 this.TimerController_dy_var = velocity.dy;
 this.bus.emit('dy=', this.TimerController_dy_var);
+});
+this.statemachine.to(null).when((fire) => {return fire._port === 'ctrl_in' && fire._msg === 'fire';}).effect((fire) => {
+setTimeout(() => this.bus.emit('controls?fire', fire.id), 0);
 });
 VelocityController_SC_Running.to(VelocityController_SC_Running).when((timer_timeout) => {return timer_timeout._port === 'clock' && timer_timeout._msg === 'timer_timeout' && timer_timeout.id === this.VelocityController_timerID_var;}).effect((timer_timeout) => {
 this.TimerController_posX_var = this.TimerController_posX_var + this.TimerController_dx_var;
@@ -86,7 +86,7 @@ this.bus.emit('posY=', this.TimerController_posY_var);
 }
 
 }
-this.bus.emit('controls?position', this.TimerController_posX_var, this.TimerController_posY_var);
+setTimeout(() => this.bus.emit('controls?position', this.TimerController_posX_var, this.TimerController_posY_var), 0);
 });
 }
 //ThingML-defined functions
@@ -131,15 +131,15 @@ this._receive({_port:"clock", _msg:"timer_timeout", id:id});
 
 VelocityController.prototype.toString = function() {
 let result = 'instance ' + this.name + ':' + this.constructor.name + '\n';
-result += '\n\tdy = ' + this.TimerController_dy_var;
 result += '\n\tYMAX = ' + this.TimerController_YMAX_var;
-result += '\n\tposY = ' + this.TimerController_posY_var;
-result += '\n\tdx = ' + this.TimerController_dx_var;
-result += '\n\tposX = ' + this.TimerController_posX_var;
-result += '\n\tYMIN = ' + this.TimerController_YMIN_var;
-result += '\n\tXMAX = ' + this.TimerController_XMAX_var;
-result += '\n\ttimerID = ' + this.VelocityController_timerID_var;
 result += '\n\tXMIN = ' + this.TimerController_XMIN_var;
+result += '\n\ttimerID = ' + this.VelocityController_timerID_var;
+result += '\n\tdy = ' + this.TimerController_dy_var;
+result += '\n\tposX = ' + this.TimerController_posX_var;
+result += '\n\tposY = ' + this.TimerController_posY_var;
+result += '\n\tXMAX = ' + this.TimerController_XMAX_var;
+result += '\n\tYMIN = ' + this.TimerController_YMIN_var;
+result += '\n\tdx = ' + this.TimerController_dx_var;
 result += '';
 return result;
 };
