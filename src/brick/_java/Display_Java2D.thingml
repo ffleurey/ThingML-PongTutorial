@@ -4,9 +4,9 @@ import "../Controller.thingml"
 thing Java2DDisplay includes Display, ControllerMsgs 
 	
 @java_import "
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
@@ -33,12 +33,12 @@ import java.awt.event.*;"
 	
 	readonly property SCALE 	: UInt8 = 5
 	
-	property XFRAMESIZE : UInt16
-	property YFRAMESIZE : UInt16
+	property XFRAMESIZE : Int16
+	property YFRAMESIZE : Int16
 	
 	
 	provided port vctrl {
-		sends fire, velocity
+		sends fire, velocity, position
 	}
 	
 	function initDisplay(xsize : UInt8, ysize : UInt8) do
@@ -58,7 +58,7 @@ import java.awt.event.*;"
 				  g.drawImage(displayBuffer, 0, 0, '&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&', 0, 0, '&XFRAMESIZE&', '&YFRAMESIZE&', null);
 			  }
 		};
-		canevas.setSize(new Dimension('&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&'));
+		//canevas.setSize(new Dimension('&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&'));
 		canevas.setPreferredSize(new Dimension('&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&'));
 		
 		frame = new JFrame("ThingML Java2D Display") {
@@ -72,9 +72,10 @@ import java.awt.event.*;"
         };
         
         frame.setBackground(Color.black);
+      
         frame.add(canevas);
         frame.pack();
-        frame.setResizable(false);
+        //frame.setResizable(false);
         
         canevas.addKeyListener(new KeyListener() {
 
@@ -107,6 +108,18 @@ import java.awt.event.*;"
 			     }
             }
         });
+        
+        canevas.addMouseMotionListener(new MouseMotionListener() {
+
+            @Override
+            public void mouseDragged(MouseEvent e) {}
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+            	'updatePosition('e.getX()')'
+            }
+        });
+        
         canevas.setFocusable(true);
         canevas.requestFocusInWindow();
         
@@ -114,6 +127,11 @@ import java.awt.event.*;"
         
         canevas.repaint();'
 	end
+	
+	function updatePosition(mousex : Integer) do
+	 vctrl!position(((mousex/SCALE - XFRAMESIZE/2)*220) / XFRAMESIZE, 0)
+	end
+	
 	
 	function destroyDisplay() do
 		'frame.setVisible(false);

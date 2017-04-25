@@ -3,7 +3,6 @@ import "Display.thingml"
 import "Controller.thingml"
 
 thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerMsg {
-
 	message lostBall();
 	message nextLevel();
 
@@ -58,7 +57,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
 	// Pad variables
 	property padx 	: Int16 = YMAX / 2			// Middle of the pad
 	property pady 	: Int16 = YMAX - 6 * SCALE	// Top of the pad
-	property padlen : Int16 = XMAX / 6			// Length of the pad
+	property padlen : Int16 = 25 * SCALE		// Length of the pad (should be a multiple of SCALE)
 
 	// Variables used by the drawBall function to erase the previous ball
 	property prevBX	: Int16 = -1
@@ -78,6 +77,8 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
 		by = pady - br/SCALE
 		dx = XMAX / 98
 		dy = -XMAX / 65
+		prevBX = -1
+		prevBY = -1
 	end
 
 	function eraseBall() do
@@ -87,6 +88,9 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
 			display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
 			display!fillRect(prevBX, prevBY, bs, bs)
 		end
+
+		prevBX = -1
+		prevBY = -1
 	end
 
 	function drawBall() do
@@ -145,9 +149,9 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
 	function drawWalls() do
 		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
 		display!fillRect(LEFT/SCALE-1, TOP/SCALE-1, (RIGHT-LEFT)/SCALE+1, 1)
-		display!fillRect(LEFT/SCALE-1, BOTTOM/SCALE-1, (RIGHT-LEFT)/SCALE+1, 1)
+		display!fillRect(LEFT/SCALE-1, BOTTOM/SCALE, (RIGHT-LEFT)/SCALE+1, 1)
 		display!fillRect(LEFT/SCALE-1, TOP/SCALE, 1, (BOTTOM-TOP)/SCALE)
-		display!fillRect(RIGHT/SCALE-1, TOP/SCALE, 1, (BOTTOM-TOP)/SCALE)
+		display!fillRect(RIGHT/SCALE, TOP/SCALE, 1, (BOTTOM-TOP)/SCALE)
 	end
 
 	// Bricks variable
@@ -248,8 +252,6 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
 
 		internal event e : controller?position action do
 			// Map the controller values [-100..100] to the pad position
-			//var center : Int32 = (RIGHT - LEFT) / 2
-			//padx = LEFT + center + (e.x * (RIGHT - LEFT - padlen)) / 200
 			var center : Int32 = (RIGHT - LEFT - padlen)
 			center = e.x * center
 			center = center / 200
@@ -290,7 +292,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
 			guard t.id == 0 and countdown > 0 action do
 				clock!timer_start(0, 33)
 				drawPad() // Draw the Pad
-				drawCountDown(countdown/30+1)
+				if (countdown % 30 == 0) drawCountDown(countdown/30)
 				countdown = countdown - 1
 				display!update()
 			end
@@ -305,7 +307,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
 
 		state PLAY {
 
-			on entry do
+	  on entry do
         clock!timer_start(0, 33)
       end
 			//transition -> PLAY event t : clock?timer_timeout guard t.id == 1 action do
@@ -360,8 +362,8 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
         		clock!timer_start(0, 33)
 			end
 
-			transition -> LOSTBALL event game?lostBall
-			transition -> NEXTLEVEL event game?nextLevel
+			transition -> LOSTBALL event game?lostBall action clock!timer_cancel(0)
+			transition -> NEXTLEVEL event game?nextLevel action clock!timer_cancel(0)
 		}
 
 		state LOSTBALL {
