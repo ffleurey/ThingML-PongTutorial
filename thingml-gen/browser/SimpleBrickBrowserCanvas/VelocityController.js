@@ -5,7 +5,7 @@ StateJS.internalTransitionsTriggerCompletion = true;
 /**
  * Definition for type : VelocityController
  **/
-function VelocityController(name, root, TimerController_XMIN_var, TimerController_XMAX_var, TimerController_dx_var, VelocityController_timerID_var, TimerController_YMAX_var, TimerController_posX_var, TimerController_dy_var, TimerController_posY_var, TimerController_YMIN_var, debug) {
+function VelocityController(name, root, TimerController_YMIN_var, TimerController_posY_var, TimerController_YMAX_var, TimerController_XMIN_var, TimerController_XMAX_var, TimerController_dy_var, TimerController_dx_var, VelocityController_timerID_var, TimerController_posX_var, debug) {
 
 this.name = name;
 this.root = (root === null)? this : root;
@@ -13,24 +13,24 @@ this.debug = debug;
 this.ready = false;
 this.bus = new EventEmitter();
 //Attributes
+this.TimerController_YMIN_var = TimerController_YMIN_var;
+this.debug_TimerController_YMIN_var = TimerController_YMIN_var;
+this.TimerController_posY_var = TimerController_posY_var;
+this.debug_TimerController_posY_var = TimerController_posY_var;
+this.TimerController_YMAX_var = TimerController_YMAX_var;
+this.debug_TimerController_YMAX_var = TimerController_YMAX_var;
 this.TimerController_XMIN_var = TimerController_XMIN_var;
 this.debug_TimerController_XMIN_var = TimerController_XMIN_var;
 this.TimerController_XMAX_var = TimerController_XMAX_var;
 this.debug_TimerController_XMAX_var = TimerController_XMAX_var;
+this.TimerController_dy_var = TimerController_dy_var;
+this.debug_TimerController_dy_var = TimerController_dy_var;
 this.TimerController_dx_var = TimerController_dx_var;
 this.debug_TimerController_dx_var = TimerController_dx_var;
 this.VelocityController_timerID_var = VelocityController_timerID_var;
 this.debug_VelocityController_timerID_var = VelocityController_timerID_var;
-this.TimerController_YMAX_var = TimerController_YMAX_var;
-this.debug_TimerController_YMAX_var = TimerController_YMAX_var;
 this.TimerController_posX_var = TimerController_posX_var;
 this.debug_TimerController_posX_var = TimerController_posX_var;
-this.TimerController_dy_var = TimerController_dy_var;
-this.debug_TimerController_dy_var = TimerController_dy_var;
-this.TimerController_posY_var = TimerController_posY_var;
-this.debug_TimerController_posY_var = TimerController_posY_var;
-this.TimerController_YMIN_var = TimerController_YMIN_var;
-this.debug_TimerController_YMIN_var = TimerController_YMIN_var;
 this.build(name);
 }
 //State machine (states and regions)
@@ -120,15 +120,15 @@ this._receive({_port:"clock", _msg:"timer_timeout", id:id});
 
 VelocityController.prototype.toString = function() {
 let result = 'instance ' + this.name + ':' + this.constructor.name + '\n';
+result += '\n\tYMIN = ' + this.TimerController_YMIN_var;
+result += '\n\tposY = ' + this.TimerController_posY_var;
+result += '\n\tYMAX = ' + this.TimerController_YMAX_var;
 result += '\n\tXMIN = ' + this.TimerController_XMIN_var;
 result += '\n\tXMAX = ' + this.TimerController_XMAX_var;
+result += '\n\tdy = ' + this.TimerController_dy_var;
 result += '\n\tdx = ' + this.TimerController_dx_var;
 result += '\n\ttimerID = ' + this.VelocityController_timerID_var;
-result += '\n\tYMAX = ' + this.TimerController_YMAX_var;
 result += '\n\tposX = ' + this.TimerController_posX_var;
-result += '\n\tdy = ' + this.TimerController_dy_var;
-result += '\n\tposY = ' + this.TimerController_posY_var;
-result += '\n\tYMIN = ' + this.TimerController_YMIN_var;
 result += '';
 return result;
 };
