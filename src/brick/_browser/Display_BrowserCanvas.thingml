@@ -16,7 +16,7 @@ thing BrowserCanvasDisplay includes Display, ControllerMsgs
   property Display : CanvasContext
   
   provided port vctrl {
-		sends fire, velocity
+		sends fire, velocity, position
 	}
   
 	function initDisplay(xsize : UInt8, ysize : UInt8) do  
@@ -58,11 +58,20 @@ thing BrowserCanvasDisplay includes Display, ControllerMsgs
       display.style.top = "50%";
       display.style.marginLeft = '&-XFRAMESIZE/2*SCALE&'+"px";
       display.style.marginTop = '&-YFRAMESIZE/2*SCALE&'+"px";
+      display.style.cursor = "none";
       document.body.appendChild(display);
       
-      //bufferCtx.lineWidth = 2;
-      bufferCtx.fillStyle = "rgb(255,0,0)";
-      bufferCtx.fillRect(0,0,100,100);
+      // Add mouse over events
+      display.addEventListener("mousemove", (e) => {
+        var mouseX = e.offsetX/('&XFRAMESIZE*SCALE&'); // [0,1]
+        
+        // TODO: Some hardcoded numbers
+        var dispX = mouseX*10240; //XMAX
+        var posX = (dispX-5120)*200/8406;
+        posX = Math.max(-100, Math.min(100, posX));
+        
+        'vctrl!position('posX', 0)'
+      });
     '
     clearScreen()
     
@@ -80,6 +89,13 @@ thing BrowserCanvasDisplay includes Display, ControllerMsgs
           'vctrl!velocity(0,0)'
         }
       });
+    '
+    
+    /* Add a global function to set the position */
+    '
+      window.setPadPosition = (x) => { //[-100, 100]
+        'vctrl!position('x', 0)'
+      };
     '
   end
   
