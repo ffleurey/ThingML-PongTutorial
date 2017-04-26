@@ -1,8 +1,9 @@
 import "_Timer.thingml"
 import "Display.thingml"
+import "Sound.thingml"
 import "Controller.thingml"
 
-thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerMsg {
+thing SimpleBrick includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IAControllerMsg {
 	message lostBall();
 	message nextLevel();
 
@@ -16,6 +17,12 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
 	{
 		receives displayReady, displayError
 		sends create, fillRect, drawRect, clear, setColor, setBGColor, drawInteger, update
+	}
+
+	required port sound
+	@sync_send "true"
+	{
+		sends beep
 	}
 
 	required port controller {
@@ -351,6 +358,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerM
 					dy = -dy // Update the direction of the ball
 					score = score + 10 // Increment score
 					drawScore()
+					sound!beep()
 					if (bricksLeft() == 0) game!nextLevel()
 				end
 

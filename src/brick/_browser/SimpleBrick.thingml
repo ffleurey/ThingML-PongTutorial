@@ -1,4 +1,5 @@
 import "Display_BrowserCanvas.thingml"
+import "Sound_Browser.thingml"
 import "../SimpleBrick.thingml"
 import "../Display.thingml"
 import "../Controller.thingml"
@@ -8,15 +9,15 @@ configuration SimpleBrickBrowserCanvas
 {
 	instance bb : SimpleBrick
 	instance disp : BrowserCanvasDisplay
+	instance beep : BrowserSound
 	instance ctrl : VelocityController
 	instance timer : TimerBrowser
-
-  //instance hacks : JavaScriptBrickHacks
 
 	connector bb.clock => timer.timer
   connector ctrl.clock => timer.timer
 
 	connector bb.display => disp.display
+	connector bb.sound => beep.sound
 	connector bb.controller => ctrl.controls
 	connector ctrl.ctrl_in => disp.vctrl
 }
