@@ -241,6 +241,11 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IA
 		display!drawInteger(98, 2, score, 5, 2)
 	end
 
+	function drawLevel() do
+		display!setColor(158,209,130)
+		display!drawInteger(70, 2, level, 2, 2)
+	end
+
 	function drawLives() do
 		// erase all existing ball
 		display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
@@ -291,6 +296,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IA
 				clock!timer_start(0, 33)
 				countdown = 30*3 // 3sec
 				drawScore()
+				drawLevel()
 				drawLives()
 				display!update()
 			end
@@ -299,7 +305,10 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IA
 			guard t.id == 0 and countdown > 0 action do
 				clock!timer_start(0, 33)
 				drawPad() // Draw the Pad
-				if (countdown % 30 == 0) drawCountDown(countdown/30)
+				if (countdown % 30 == 0) do
+					drawCountDown(countdown/30)
+					sound!beep()
+				end
 				countdown = countdown - 1
 				display!update()
 			end
@@ -307,6 +316,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IA
 			transition -> PLAY  event t : clock?timer_timeout
 			guard t.id == 0 and countdown == 0 action do
 				drawCountDown(0)
+				sound!beep()
 				resetBall()
 				display!update()
 			end
@@ -397,6 +407,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IA
 			on entry do
 				clock!timer_start(0, 1000)
 				level = level + 1
+				drawLevel()
 				eraseBall()
 				erasePad()
 				drawLives()
