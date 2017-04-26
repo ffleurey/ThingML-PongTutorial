@@ -410,6 +410,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IA
 				drawLevel()
 				eraseBall()
 				erasePad()
+				if (padlen > 5 * SCALE) padlen = padlen - (2 * SCALE) //TODO: reduce padlen for odd levels and accelerate game for even level
 				drawLives()
 				createBricks()
 				display!update()
