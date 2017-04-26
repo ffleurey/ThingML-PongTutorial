@@ -1,0 +1,10 @@
+import "../Sound.thingml"
+
+thing JavaSound includes SoundController
+{
+
+  function beep() do
+    'java.awt.Toolkit.getDefaultToolkit().beep();' //On Windows, Control Panel -> Sound -> Sounds -> Make sure "default beep" is associated to a sound
+  end
+
+}

@@ -1,20 +1,23 @@
 import "Display_Java2D.thingml"
+import "Sound_AWT.thingml"
 import "../SimpleBrick.thingml"
 import "../Display.thingml"
 import "../Controller.thingml"
 import "TimerJava.thingml"
 
-configuration SimpleBrickJava2D 
+configuration SimpleBrickJava2D
 {
 	instance bb : SimpleBrick
 	instance disp : Java2DDisplay
+	instance beep : JavaSound
 	instance ctrl : VelocityController
 	instance timer : TimerJava
-	
+
 	connector bb.clock => timer.timer
-    connector ctrl.clock => timer.timer
-	
+  connector ctrl.clock => timer.timer
+
 	connector bb.display => disp.display
+	connector bb.sound => beep.sound
 	connector bb.controller => ctrl.controls
 	connector ctrl.ctrl_in => disp.vctrl
-}  
+}
