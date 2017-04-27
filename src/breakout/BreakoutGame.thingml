@@ -65,6 +65,9 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAController
 
 	property bgcolor : UInt8[3]
 	property fgcolor : UInt8[3]
+
+  property period : Int16 = 33
+
 	function initColors() do
 		bgcolor[0] = 53 	bgcolor[1] = 40 	bgcolor[2] = 120
 		fgcolor[0] = 107 	fgcolor[1] = 94 	fgcolor[2] = 174
@@ -323,7 +326,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAController
 		state PLAY {
 
 	  on entry do
-        clock!timer_start(0, 33)
+        clock!timer_start(0, period)
       end
 			//transition -> PLAY event t : clock?timer_timeout guard t.id == 1 action do
       internal event t : clock?timer_timeout guard t.id == 0 action do
@@ -373,7 +376,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAController
 				ia!updateIA(bx, by, padx, pady)
 				display!update()
 
-        		clock!timer_start(0, 33)
+        		clock!timer_start(0, period)
 			end
 
 			transition -> LOSTBALL event game?lostBall action clock!timer_cancel(0)
@@ -406,6 +409,8 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAController
 				drawLevel()
 				eraseBall()
 				erasePad()
+				if (level % 2 == 0 and padlen > 5 * SCALE) padlen = padlen - (2 * SCALE) //reduce size of the pad
+				if (level % 2 == 1 and period > 15) period = period - 2                  //accelerate game
 				drawLives()
 				createBricks()
 				display!update()
