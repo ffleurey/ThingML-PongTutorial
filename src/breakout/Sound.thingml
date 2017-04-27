@@ -1,0 +1,21 @@
+import "lib/_Datatypes.thingml"
+
+thing fragment SoundMsgs {
+	message tone(freq : UInt16, time : UInt16)
+}
+
+thing fragment Sound includes SoundMsgs {
+
+  provided port sound {
+    receives tone
+  }
+
+  abstract function tone(f : UInt16, t : UInt16) @abstract "true"
+
+  statechart behavior init INIT {
+    state INIT {
+      internal event t: sound?tone
+      action tone(t.freq, t.time)
+    }
+  }
+}

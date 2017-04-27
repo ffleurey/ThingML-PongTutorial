@@ -1,0 +1,14 @@
+import "../Sound.thingml"
+
+object Synth;
+
+thing SoundControllerBrowser includes Sound
+@js_dep "src=\"lib/tone.min.js\" target=\"Tone\""
+{
+
+  readonly property synth : Synth = 'new Tone.Synth().toMaster()'
+
+  function tone(f : UInt16, t : UInt16) do
+    '' & synth & '.triggerAttackRelease(' & f & ', ' & t & '/1000)' //Important: we should avoid Integer division, that is why /1000 is in JS not in ThingML
+  end
+}

@@ -1,14 +1,21 @@
 import "lib/_Timer.thingml"
 import "Display.thingml"
+import "Sound.thingml"
 import "Controller.thingml"
 
-thing BreakoutGame includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAControllerMsg {
+thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IAControllerMsg {
 	message lostBall();
 	message nextLevel();
 
 	required port clock {
 		sends timer_start, timer_cancel
 		receives timer_timeout
+	}
+
+	required port sound
+	@sync_send "true"
+	{
+		sends tone
 	}
 
 	required port display
@@ -67,6 +74,10 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAController
 	property fgcolor : UInt8[3]
 
   property period : Int16 = 33
+
+	readonly property tone1 : UInt16 = 440 //Hz
+	readonly property tone2: UInt16 = 880  //Hz
+	readonly property tone_duration : UInt16 = 50 //ms
 
 	function initColors() do
 		bgcolor[0] = 53 	bgcolor[1] = 40 	bgcolor[2] = 120
@@ -341,9 +352,24 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAController
 				var wb : UInt16 = BOTTOM - br
 
 				// Check for collisions with the walls
-				if (bx < wl) 		do	dx = -dx 	bx = 2*wl-bx	incrementScore(-1) end
-				else if (bx > wr)	do	dx = -dx	bx = 2*wr-bx	incrementScore(-1) end
-				if (by < wt)		do	dy = -dy	by = 2*wt-by	incrementScore(-1) end
+				if (bx < wl) do
+					sound!tone(tone2, tone_duration)
+					dx = -dx
+					bx = 2*wl-bx
+					incrementScore(-1)
+				end
+				else if (bx > wr)	do
+					sound!tone(tone2, tone_duration)
+					dx = -dx
+					bx = 2*wr-bx
+					incrementScore(-1)
+				end
+				if (by < wt)	do
+				  sound!tone(tone2, tone_duration)
+				  dy = -dy
+					by = 2*wt-by
+					incrementScore(-1)
+				end
 				else if (by > wb)	do
 					game!lostBall()
 					//ia!lostBall()
@@ -353,6 +379,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAController
 				if (dy > 0) do // the ball has to be going down
 					if (by > pady-br and by < pady+br ) do // Collision on the Y axis
 						if (bx > padx-padlen/2 and bx < padx+padlen/2) do // Collision on the X axis
+						  sound!tone(tone2, tone_duration)
 							dy = -dy 					// Bounce on the pad
 							by = 2*(pady-br)-by			// Adjust the position of the ball
 							dx = dx/4 + (bx-padx)/4		// Adjust horizontal speed
@@ -366,6 +393,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, ControllerMsgs, IAController
 											collideBrick(bx+br, by+br) or collideBrick(bx-br, by+br)
 
 				if (collision) do
+				  sound!tone(tone1, tone_duration)
 					dy = -dy // Update the direction of the ball
 					incrementScore(10)
 					if (bricksLeft() == 0) game!nextLevel()
