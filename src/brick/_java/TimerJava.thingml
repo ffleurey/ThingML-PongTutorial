@@ -19,7 +19,7 @@ thing TimerJava includes TimerMsgs
     	cancel(id)
         'final int t_id = '&id&';'
         'TimerTask t =  new TimerTask() { public void run(){' 
-        	timer!timer_timeout('t_id') '
+        	timer!timer_timeout('t_id')'
         } };
         tasks.put(t_id, t);
         timer.schedule(t, ' & delay & ');'
