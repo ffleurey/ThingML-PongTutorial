@@ -89,8 +89,8 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 	function resetBall() do
 		bx = padx - br/SCALE
 		by = pady - br/SCALE
-		dx = XMAX / 98
-		dy = -XMAX / 65
+		dx = (padx + prevBX + prevBY) % 300 - 150 // A sort of random number between -150 and 150
+		if (dy > 0) dy = - dy
 		prevBX = -1
 		prevBY = -1
 	end
@@ -437,8 +437,8 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 				drawLevel()
 				eraseBall()
 				erasePad()
-				if (level % 2 == 0 and padlen > 5 * SCALE) padlen = padlen - (2 * SCALE) //reduce size of the pad
-				if (level % 2 == 1 and period > 15) period = period - 2                  //accelerate game
+				if (level % 2 == 0 and padlen > 5 * SCALE) padlen = padlen - (4 * SCALE) //reduce size of the pad
+				if (level % 2 == 1) dy = (dy * 3) / 2	// increase speed of the ball by 3/2
 				drawLives()
 				createBricks()
 				display!update()
