@@ -321,7 +321,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 			guard t.id == 0 and countdown > 0 action do
 				clock!timer_start(0, 33)
 				drawPad() // Draw the Pad
-				if (countdown % 30 == 0) drawCountDown(countdown/30)
+				if ((countdown % 30) == 0) drawCountDown(countdown/30)
 				countdown = countdown - 1
 				display!update()
 			end
@@ -437,8 +437,8 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 				drawLevel()
 				eraseBall()
 				erasePad()
-				if (level % 2 == 0 and padlen > 5 * SCALE) padlen = padlen - (4 * SCALE) //reduce size of the pad
-				if (level % 2 == 1) dy = (dy * 3) / 2	// increase speed of the ball by 3/2
+				if ((level % 2) == 0 and padlen > 5 * SCALE) padlen = padlen - (4 * SCALE) //reduce size of the pad
+				if ((level % 2) == 1) dy = (dy * 3) / 2	// increase speed of the ball by 3/2
 				drawLives()
 				createBricks()
 				display!update()
