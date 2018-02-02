@@ -87,7 +87,7 @@ thing fragment BouncingBallMsgs {
 	message updateBall(oldx : UInt8, oldy : UInt8, newx : UInt8, newy : UInt8)
 }
 
-thing fragment BouncingBall includes TimerMsgs, Constants, BouncingBallMsgs {
+thing BouncingBall includes TimerMsgs, Constants, BouncingBallMsgs {
 	
 	required port clock {
 		receives timer_timeout

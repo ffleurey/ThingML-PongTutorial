@@ -305,7 +305,7 @@ thing SimpleBrick includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IA
 			guard t.id == 0 and countdown > 0 action do
 				clock!timer_start(0, 33)
 				drawPad() // Draw the Pad
-				if (countdown % 30 == 0) do
+				if ((countdown % 30) == 0) do
 					drawCountDown(countdown/30)
 					sound!beep()
 				end
