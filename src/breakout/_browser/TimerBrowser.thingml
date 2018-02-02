@@ -6,7 +6,7 @@ object Array;
 thing TimerBrowser includes TimerMsgs
 {
 
-  property Timeouts : Array = '{}'
+  property Timeouts : Array = `{}` as Array
 	
 	provided port timer {
 		receives timer_start, timer_cancel
@@ -14,25 +14,25 @@ thing TimerBrowser includes TimerMsgs
 	}
 
   function startTimer(id: Integer, delay : Integer) do
-    '
-      if ('&Timeouts&'['&id&'] != undefined) {
-        ' cancel(id) '
+    `
+      if (`&Timeouts&`[`&id&`] != undefined) {
+        ` cancel(id) `
       }
       
-      '&Timeouts&'['&id&'] = setTimeout(() => {
-        ' timer!timer_timeout(id) '
-        '&Timeouts&'['&id&'] = undefined;
-      }, '&delay&');
-    '
+      `&Timeouts&`[`&id&`] = setTimeout(() => {
+        ` timer!timer_timeout(id) `
+        `&Timeouts&`[`&id&`] = undefined;
+      }, `&delay&`);
+    `
     end
 
     function cancel(id: Integer) do
-      '
-        if ('&Timeouts&'['&id&'] != undefined) {
-          clearTimeout('&Timeouts&'['&id&']);
-          '&Timeouts&'['&id&'] = undefined;
+      `
+        if (`&Timeouts&`[`&id&`] != undefined) {
+          clearTimeout(`&Timeouts&`[`&id&`]);
+          `&Timeouts&`[`&id&`] = undefined;
         }
-      '
+      `
     end
 
     statechart SoftTimer init default {

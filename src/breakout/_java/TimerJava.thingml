@@ -15,20 +15,20 @@ thing TimerJava includes TimerMsgs
 
     function startTimer(id: Integer, delay : Integer) do
     
-    	//if (id == 0) 'System.out.println("StartTimer " + '&id&' + ", " + '&delay&');'
+    	//if (id == 0) `System.out.println("StartTimer " + `&id&` + ", " + `&delay&`);`
     	cancel(id)
-        'final int t_id = '&id&';'
-        'TimerTask t =  new TimerTask() { public void run(){' 
-        	timer!timer_timeout('t_id') '
+        `final int t_id = `&id&`;`
+        `TimerTask t =  new TimerTask() { public void run(){` 
+        	timer!timer_timeout(`t_id` as Integer) `
         } };
         tasks.put(t_id, t);
-        timer.schedule(t, ' & delay & ');'
+        timer.schedule(t, ` & delay & `);`
     end
 
     function cancel(id: Integer) do
-    	'TimerTask t = tasks.get('&id&');'
-        'if (t != null) t.cancel();'
-        'timer.purge();'
+    	`TimerTask t = tasks.get(`&id&`);`
+        `if (t != null) t.cancel();`
+        `timer.purge();`
     end
 
     statechart SoftTimer init default {

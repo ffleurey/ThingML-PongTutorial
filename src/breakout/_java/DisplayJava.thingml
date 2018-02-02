@@ -21,7 +21,7 @@ import java.awt.event.*;"
 	// Cache the colors which have been already created
 	protected Hashtable<String, Color> colors = new Hashtable<String, Color>();
 	protected Color getColor(int r, int g, int b) {
-		String key = new String() + r + ';' + g + ';' +  b;
+		String key = new String() + r + `;` + g + `;` +  b;
 		if (colors.containsKey(key)) return colors.get(key);
 		else {
 			Color c = new Color(r,g,b);
@@ -44,8 +44,8 @@ import java.awt.event.*;"
 	function initDisplay(xsize : UInt8, ysize : UInt8) do
 		XFRAMESIZE = xsize
 		YFRAMESIZE = ysize
-		'
-		final BufferedImage displayBuffer = new BufferedImage('&XFRAMESIZE&', '&YFRAMESIZE&', BufferedImage.TYPE_INT_ARGB);
+		`
+		final BufferedImage displayBuffer = new BufferedImage(`&XFRAMESIZE&`, `&YFRAMESIZE&`, BufferedImage.TYPE_INT_ARGB);
 		g2d = displayBuffer.createGraphics();
 		
 		canevas = new JPanel() {
@@ -55,11 +55,11 @@ import java.awt.event.*;"
 			  }
 			
 			  public void paint(Graphics g) {
-				  g.drawImage(displayBuffer, 0, 0, '&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&', 0, 0, '&XFRAMESIZE&', '&YFRAMESIZE&', null);
+				  g.drawImage(displayBuffer, 0, 0, `&XFRAMESIZE * SCALE&`, `&YFRAMESIZE * SCALE&`, 0, 0, `&XFRAMESIZE&`, `&YFRAMESIZE&`, null);
 			  }
 		};
-		//canevas.setSize(new Dimension('&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&'));
-		canevas.setPreferredSize(new Dimension('&XFRAMESIZE * SCALE&', '&YFRAMESIZE * SCALE&'));
+		//canevas.setSize(new Dimension(`&XFRAMESIZE * SCALE&`, `&YFRAMESIZE * SCALE&`));
+		canevas.setPreferredSize(new Dimension(`&XFRAMESIZE * SCALE&`, `&YFRAMESIZE * SCALE&`));
 		
 		frame = new JFrame("ThingML Java2D Display") {
             private static final long serialVersionUID = 1L;
@@ -87,10 +87,10 @@ import java.awt.event.*;"
             	int keyCode = e.getKeyCode();
 			    switch( keyCode ) { 
 			        case KeyEvent.VK_LEFT:
-			            'vctrl!velocity(0,0)'
+			            `vctrl!velocity(0,0)`
 			            break;
 			        case KeyEvent.VK_RIGHT :
-			            'vctrl!velocity(0,0)'
+			            `vctrl!velocity(0,0)`
 			            break;
 			     }
             }
@@ -100,10 +100,10 @@ import java.awt.event.*;"
                 int keyCode = e.getKeyCode();
 			    switch( keyCode ) { 
 			        case KeyEvent.VK_LEFT:
-			            'vctrl!velocity(-8,0)'
+			            `vctrl!velocity(-8,0)`
 			            break;
 			        case KeyEvent.VK_RIGHT :
-			            'vctrl!velocity(8,0)'
+			            `vctrl!velocity(8,0)`
 			            break;
 			     }
             }
@@ -116,7 +116,7 @@ import java.awt.event.*;"
 
             @Override
             public void mouseMoved(MouseEvent e) {
-            	'updatePosition('e.getX()')'
+            	`updatePosition(`e.getX()`)`
             }
         });
         
@@ -125,7 +125,7 @@ import java.awt.event.*;"
         
         frame.setVisible(true);
         
-        canevas.repaint();'
+        canevas.repaint();`
 	end
 	
 	function updatePosition(mousex : Integer) do
@@ -134,28 +134,28 @@ import java.awt.event.*;"
 	
 	
 	function destroyDisplay() do
-		'frame.setVisible(false);
-		frame.dispose();'
+		`frame.setVisible(false);
+		frame.dispose();`
 	end
 	
 	function clearScreen() do 
-        'g2d.clearRect(0, 0, '&XFRAMESIZE&', '&YFRAMESIZE&');'
+        `g2d.clearRect(0, 0, `&XFRAMESIZE&`, `&YFRAMESIZE&`);`
 	end
 	
 	function setColor(r : UInt8, g : UInt8, b : UInt8) do
-		'g2d.setColor(getColor('&r&','&g&','&b&'));'
+		`g2d.setColor(getColor(`&r&`,`&g&`,`&b&`));`
 	end 
 	
 	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
-		'g2d.drawRect('&x&','&y&','&width-1&','&height-1&');'
+		`g2d.drawRect(`&x&`,`&y&`,`&width-1&`,`&height-1&`);`
 	end
 	
 	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
-		'g2d.fillRect('&x&','&y&','&width&','&height&');'
+		`g2d.fillRect(`&x&`,`&y&`,`&width&`,`&height&`);`
 	end
 	
 	function updateDisplay() do
-		'canevas.repaint();'
+		`canevas.repaint();`
 	end
 	
 }

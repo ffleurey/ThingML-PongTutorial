@@ -16,12 +16,12 @@ thing DisplayArduino includes Display
 	property XFRAMESIZE : UInt16
 	property YFRAMESIZE : UInt16
 	
-	property color : UInt16 = 'ST7735_BLACK'
+	property color : UInt16 = `ST7735_BLACK`
 	
 	function initDisplay(xsize : UInt8, ysize : UInt8) do
-		'tft.initR(INITR_BLACKTAB);
+		`tft.initR(INITR_BLACKTAB);
 		tft.fillScreen(ST7735_BLACK);
-		tft.setRotation(3);'
+		tft.setRotation(3);`
 	end
 	
 	function destroyDisplay() do
@@ -29,19 +29,19 @@ thing DisplayArduino includes Display
 	end
 	
 	function clearScreen() do 
-		'tft.fillScreen(ST7735_BLACK);'
+		`tft.fillScreen(ST7735_BLACK);`
 	end
 	
 	function setColor(r : UInt8, g : UInt8, b : UInt8) do
-		color = 'tft.Color565('&r&', '&g&', '&b&')'
+		color = `tft.Color565(`&r&`, `&g&`, `&b&`)`
 	end 
 	
 	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
-		'tft.drawRect('&x&','&y&','&width&','&height&','&color&');'
+		`tft.drawRect(`&x&`,`&y&`,`&width&`,`&height&`,`&color&`);`
 	end
 	
 	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
-		'tft.fillRect('&x&','&y&','&width&','&height&','&color&');'
+		`tft.fillRect(`&x&`,`&y&`,`&width&`,`&height&`,`&color&`);`
 	end
 	
 	function updateDisplay() do

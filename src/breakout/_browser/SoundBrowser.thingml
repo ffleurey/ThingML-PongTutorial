@@ -6,9 +6,9 @@ thing SoundControllerBrowser includes Sound
 @js_include "https://cdnjs.cloudflare.com/ajax/libs/tone/0.10.0/Tone.min.js"
 {
 
-  readonly property synth : Synth = 'new Tone.Synth().toMaster()'
+  readonly property synth : Synth = `new Tone.Synth().toMaster()` as Synth
 
   function tone(f : UInt16, t : UInt16) do
-    '' & synth & '.triggerAttackRelease(' & f & ', ' & t & '/1000)' //Important: we should avoid Integer division, that is why /1000 is in JS not in ThingML
+    `` & synth & `.triggerAttackRelease(` & f & `, ` & t & `/1000)` //Important: we should avoid Integer division, that is why /1000 is in JS not in ThingML
   end
 }

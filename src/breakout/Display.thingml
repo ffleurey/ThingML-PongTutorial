@@ -198,7 +198,7 @@ thing fragment Display includes DisplayMsgs {
 			transition -> Destroyed event display?destroy action destroyDisplay()	
 		}
 		
-		state Destroyed {
+		final state Destroyed {
 			// Nothing
 		}
 	}

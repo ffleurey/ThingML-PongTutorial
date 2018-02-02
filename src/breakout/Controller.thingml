@@ -35,7 +35,7 @@ thing fragment TimerController includes Controller, TimerMsgs {
 }
 
 thing VelocityController includes TimerController {
-	
+		
 	readonly property timerID : UInt8 = 4 // Make sure to use a timer which is not already used!
 	
 	required port ctrl_in {
