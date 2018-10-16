@@ -21,7 +21,7 @@ import java.awt.event.*;"
 	// Cache the colors which have been already created
 	protected Hashtable<String, Color> colors = new Hashtable<String, Color>();
 	protected Color getColor(int r, int g, int b) {
-		String key = new String() + r + `;` + g + `;` +  b;
+		String key = new String() + r + ';' + g + ';' +  b;
 		if (colors.containsKey(key)) return colors.get(key);
 		else {
 			Color c = new Color(r,g,b);
