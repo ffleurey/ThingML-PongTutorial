@@ -1,0 +1,5 @@
+import "../DefaultBreakoutGame.thingml"
+
+thing BreakoutGameBrowser includes DefaultBreakoutGame {
+	function quit() println "done!"
+}

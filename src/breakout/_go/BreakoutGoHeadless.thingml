@@ -1,0 +1,15 @@
+import "BreakoutGameGo.thingml"
+import "timer.thingml" from stl
+
+configuration BreakoutGo
+{
+	instance game : BreakoutGameGo
+	instance disp : HeadlessDisplay
+	instance timer : TimerGo
+	instance ctrl : BasicIAController
+
+	connector game.clock => timer.timer
+	connector game.display => disp.display
+	connector game.controller => ctrl.controls
+	connector ctrl.game => game.ia
+}

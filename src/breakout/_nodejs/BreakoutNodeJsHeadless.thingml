@@ -1,0 +1,15 @@
+import "BreakoutGameNodeJS.thingml"
+import "timer.thingml" from stl
+
+configuration BreakoutNodeJS
+{
+	instance game : BreakoutGameNodeJS
+	instance disp : HeadlessDisplay
+	instance timer : TimerNodeJS
+	instance ctrl : BasicIAController
+
+	connector game.clock => timer.timer
+	connector game.display => disp.display
+	connector game.controller => ctrl.controls
+	connector ctrl.game => game.ia
+}

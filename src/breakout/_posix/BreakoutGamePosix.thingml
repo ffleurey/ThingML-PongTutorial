@@ -1,0 +1,8 @@
+import "../DefaultBreakoutGame.thingml"
+
+thing BreakoutGamePosix includes DefaultBreakoutGame {
+	function quit() do
+		println "done!"
+		`exit(0);`
+	end
+}

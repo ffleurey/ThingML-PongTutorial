@@ -1,82 +1,79 @@
-import "lib/_Timer.thingml"
+import "timer.thingml" from stl
 
 thing fragment ControllerMsgs {
-	
+
 	message velocity(dx : Int16, dy : Int16)
 	message position(x : Int16, y : Int16)
-	message fire(id : UInt8)
-	
 }
 
 thing fragment Controller includes ControllerMsgs {
-	
+
 	provided port controls {
-		sends position, fire
-	}	
+		sends position
+	}
 }
 
 thing fragment TimerController includes Controller, TimerMsgs {
-	
+
 	required port clock {
 		sends timer_start, timer_cancel
 		receives timer_timeout
 	}
-	
+
 	readonly property XMAX : Int16 = 100
 	readonly property YMAX : Int16 = 100
 	readonly property XMIN : Int16 = -100
 	readonly property YMIN : Int16 = -100
-	
+
 	property posX : Int16 = 0
 	property posY : Int16 = 0
-	
+
 	property dx : Int16 = 0
 	property dy : Int16 = 0
 }
 
 thing VelocityController includes TimerController {
-		
+
 	readonly property timerID : UInt8 = 4 // Make sure to use a timer which is not already used!
-	
+
 	required port ctrl_in {
-		receives velocity, fire, position
+		receives velocity, position
 	}
 
 	statechart SC init Running {
-		
-		internal event e:ctrl_in?fire action controls!fire(e.id)
-		internal event e:ctrl_in?velocity action do 
+
+		internal event e:ctrl_in?velocity action do
 			dx = e.dx
 			dy = e.dy
 		end
-		
+
 		state Running {
 			on entry clock!timer_start(timerID, 50)
-			
+
 			transition -> Running event e : clock?timer_timeout guard e.id == timerID
 			action do
 				posX = posX + dx
 				posY = posY + dy
-				
+
 				if (posX < XMIN) posX = XMIN
 				else if (posX > XMAX) posX = XMAX
-				
+
 				if (posY < YMIN) posY=YMIN
 				else if (posY > YMAX) 	posY=YMAX
-				
+
 				controls!position(posX, posY)
-			end	
-      
+			end
+
       internal event e : ctrl_in?position action do
         posX = e.x
         posY = e.y
-        
+
         if (posX < XMIN) posX = XMIN
 		else if (posX > XMAX) posX = XMAX
-		
+
 		if (posY < YMIN) posY=YMIN
 		else if (posY > YMAX) 	posY=YMAX
-        
+
         controls!position(posX, posY)
       end
 		}
@@ -85,34 +82,34 @@ thing VelocityController includes TimerController {
 
 
 thing DummyController includes TimerController {
-	
+
 	readonly property timerID : UInt8 = 3 // Make sure to use a timer which is not already used!
-	
+
 	statechart SC init Bouncing {
-		
-		on entry do 
+
+		on entry do
 			dx = 10
 			dy = 10
 		end
-		
+
 		state Bouncing {
-			on entry do 
+			on entry do
 				clock!timer_start(timerID, 50)
 			end
-			
+
 			transition -> Bouncing event e : clock?timer_timeout guard e.id == timerID
 			action do
 				posX = posX + dx
 				posY = posY + dy
-				
+
 				if (posX < XMIN) 		do 	posX = 2*XMIN-posX		dx = -dx	end
 				else if (posX > XMAX) 	do 	posX = 2*XMAX-posX		dx = -dx	end
-				
+
 				if (posY < YMIN) 		do 	posY = 2*YMIN-posY		dy = -dy	end
 				else if (posY > YMAX) 	do 	posY = 2*YMAX-posY		dy = -dy	end
-				
+
 				controls!position(posX, posY)
-			end	
+			end
 		}
 	}
 }
@@ -130,24 +127,26 @@ thing fragment IAController includes Controller, IAControllerMsg {
 }
 
 thing BasicIAController includes IAController {
-	
+
 	property ctrlx : Int16 = 0
-	
+
 	statechart SC init Following {
-		
+
 		state Following {
-			
+
 			on entry controls!position(ctrlx, 0)
-			
-			transition -> Following event e : game?updateIA 
+
+			transition -> Following event e : game?updateIA
 			action do
-				//'printf("bx=%d, px=%d\n", '&e.ballx&', '&e.padx&');'
+				//println "\tballx: ", e.ballx, ", bally: ", e.bally, ", padx: ", e.padx
+				
 				if (e.ballx > e.padx+400) ctrlx = ctrlx + 4
 				else if (e.ballx < e.padx-400) ctrlx = ctrlx - 4
 				if (ctrlx < -100) ctrlx = -100
 				else if (ctrlx > 100) ctrlx = 100
-			end	
+				
+				//println "\t\tctrlx: ", ctrlx
+			end
 		}
 	}
 }
-

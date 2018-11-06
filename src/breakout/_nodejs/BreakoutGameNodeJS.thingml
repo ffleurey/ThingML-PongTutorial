@@ -1,0 +1,8 @@
+import "../DefaultBreakoutGame.thingml"
+
+thing BreakoutGameNodeJS includes DefaultBreakoutGame {
+	function quit() do
+		println "done!"
+		`process.exit(0);`
+	end
+}

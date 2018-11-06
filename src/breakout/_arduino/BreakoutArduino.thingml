@@ -1,12 +1,16 @@
 import "DisplayArduino.thingml"
-import "../BreakoutGame.thingml"
+import "../DefaultBreakoutGame.thingml"
 
 protocol Timer;
+
+thing BreakoutGameArduino includes DefaultBreakoutGame {
+	function quit() println "done!"
+}
 
 configuration BreakoutArduino 
 {
 	
-	instance game : BreakoutGame
+	instance game : BreakoutGameArduino
 	instance disp : DisplayArduino
 	instance ctrl : BasicIAController
 	

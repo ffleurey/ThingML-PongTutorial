@@ -7,51 +7,51 @@ object CanvasContext;
 thing DisplayBrowser includes Display, ControllerMsgs
 {
   readonly property SCALE : UInt8 = 5
-  
+
   property XFRAMESIZE : UInt16
 	property YFRAMESIZE : UInt16
-  
+
   property Buffer : CanvasContext
   property BufferCanvas : Canvas
   property Display : CanvasContext
-  
+
   provided port vctrl {
-		sends fire, velocity, position
+		sends velocity, position
 	}
-  
-	function initDisplay(xsize : UInt8, ysize : UInt8) do  
+
+	function initDisplay(xsize : UInt8, ysize : UInt8) do
     XFRAMESIZE = xsize
     YFRAMESIZE = ysize
     `
       document.body.style.backgroundColor = "gray";
-      
+
       /* Create buffer canvas */
       var buffer = document.createElement("canvas");
       buffer.setAttribute("width", `&XFRAMESIZE&`);
       buffer.setAttribute("height", `&YFRAMESIZE&`);
       buffer.style.imageRendering = "pixelated";
       `&BufferCanvas&` = buffer;
-      
+
       var bufferCtx = buffer.getContext("2d");
       bufferCtx.imageSmoothingEnabled = false;
       bufferCtx.mozImageSmoothingEnabled = false;
       bufferCtx.webkitImageSmoothingEnabled = false;
       bufferCtx.msImageSmoothingEnabled = false;
       `&Buffer&` = bufferCtx;
-      
+
       /* Create the display canvas */
       var display = document.createElement("canvas");
       display.setAttribute("width", `&XFRAMESIZE*SCALE&`);
       display.setAttribute("height", `&YFRAMESIZE*SCALE&`);
-      
+
       var displayCtx = display.getContext("2d");
       displayCtx.imageSmoothingEnabled = false;
       displayCtx.mozImageSmoothingEnabled = false;
       displayCtx.webkitImageSmoothingEnabled = false;
       displayCtx.msImageSmoothingEnabled = false;
-      
+
       `&Display&` = displayCtx;
-      
+
       // Put it in the middle of the window
       display.style.position = "absolute";
       display.style.left = "50%";
@@ -60,21 +60,21 @@ thing DisplayBrowser includes Display, ControllerMsgs
       display.style.marginTop = `&-YFRAMESIZE/2*SCALE&`+"px";
       display.style.cursor = "none";
       document.body.appendChild(display);
-      
+
       // Add mouse over events
       display.addEventListener("mousemove", (e) => {
         var mouseX = e.offsetX/(`&XFRAMESIZE*SCALE&`); // [0,1]
-        
+
         // TODO: Some hardcoded numbers
         var dispX = mouseX*10240; //XMAX
         var posX = (dispX-5120)*200/8406;
         posX = Math.max(-100, Math.min(100, posX));
-        
-        `vctrl!position(`posX` as Integer, 0)`
+
+        `vctrl!position(`posX` as Int16, 0)`
       });
     `
     clearScreen()
-    
+
     /* Add key press event listeners */
     `
       document.addEventListener("keydown", (e) => {
@@ -90,37 +90,37 @@ thing DisplayBrowser includes Display, ControllerMsgs
         }
       });
     `
-    
+
     /* Add a global function to set the position */
     `
       window.setPadPosition = (x) => { //[-100, 100]
-        `vctrl!position(`x` as Integer, 0)`
+        `vctrl!position(`x` as Int16, 0)`
       };
     `
   end
-  
+
 	function destroyDisplay() do
   end
-  
+
 	function updateDisplay() do
     ``&Display&`.drawImage(`&BufferCanvas&`, 0, 0, `&XFRAMESIZE*SCALE&`, `&YFRAMESIZE*SCALE&`);`
     //print "Display updated"
   end
-	
-  
+
+
 	function clearScreen() do
     setColor(0,0,0)
     fillRect(0,0,XFRAMESIZE,YFRAMESIZE)
     updateDisplay()
   end
-	
+
   function setColor(r : UInt8, g : UInt8, b : UInt8) do
     `
       `&Buffer&`.strokeStyle = "rgb("+`&r&`+", "+`&g&`+", "+`&b&`+")";
       `&Buffer&`.fillStyle = "rgb("+`&r&`+", "+`&g&`+", "+`&b&`+")";
     `
   end
-  
+
 	function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
     `
       var xr = Math.floor(`&x&`);
@@ -133,7 +133,7 @@ thing DisplayBrowser includes Display, ControllerMsgs
       `&Buffer&`.fillRect(xr+wr-1, yr, 1, hr);
     `
   end
-  
+
 	function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) do
     `
       var xr = Math.floor(`&x&`);

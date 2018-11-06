@@ -8,11 +8,14 @@ configuration BreakoutPosix
 //@debug_messages "*"
 {
 	instance game : BreakoutGamePosix
-	instance disp : DisplayPosix
+	instance disp : HeadlessDisplay
 	instance timer : TimerPosix
 
 	connector game.clock => timer.timer
 	connector game.display => disp.display
-	connector game.controller => disp.controls
 	connector game.req_game => game.pro_game
+
+	instance ctrl : BasicIAController
+	connector game.controller => ctrl.controls
+	connector ctrl.game => game.ia
 }

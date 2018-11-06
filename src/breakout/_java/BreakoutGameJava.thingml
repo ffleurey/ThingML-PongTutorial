@@ -1,0 +1,8 @@
+import "../DefaultBreakoutGame.thingml"
+
+thing BreakoutGameJava includes DefaultBreakoutGame {
+	function quit() do
+		println "done!"
+		`System.exit(0);`
+	end
+}

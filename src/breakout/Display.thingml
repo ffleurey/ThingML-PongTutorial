@@ -1,7 +1,7 @@
-import "lib/_Datatypes.thingml"
+import "datatypes.thingml" from stl
 
 thing fragment DisplayMsgs {
-	
+
 	message clear()
 	message setColor(r : UInt8, g : UInt8, b : UInt8)
 	message setBGColor(r : UInt8, g : UInt8, b : UInt8)
@@ -9,27 +9,42 @@ thing fragment DisplayMsgs {
 	message fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8)
 	message drawInteger(x : UInt8, y : UInt8, v : Int16, digits : UInt8, scale:UInt8)
 	message drawThingML(x : UInt8, y : UInt8)
-	
+
 	message create(xsize : UInt8, ysize : UInt8);
 	message destroy();
 	message update();
-	
+
 	message displayReady();
 	message displayError();
 
 }
 
+thing HeadlessDisplay includes DisplayMsgs {
+	provided port display
+	{
+		receives create, destroy, update
+		receives clear, setColor, setBGColor, drawRect, fillRect, drawInteger, drawThingML
+		sends displayReady, displayError
+	}
+
+	statechart init INIT {
+		state INIT {
+			on entry display!displayReady()
+		}
+	}
+}
+
 thing fragment Display includes DisplayMsgs {
-	
-	abstract function initDisplay(xsize : UInt8, ysize : UInt8) @abstract "true"
-	abstract function destroyDisplay() @abstract "true"
-	abstract function updateDisplay() @abstract "true"
-	
+
+	abstract function initDisplay(xsize : UInt8, ysize : UInt8)
+	abstract function destroyDisplay()
+	abstract function updateDisplay()
+
 	abstract function clearScreen() @abstract "true"
-	abstract function setColor(r : UInt8, g : UInt8, b : UInt8) @abstract "true"
-	abstract function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) @abstract "true"
-	abstract function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8) @abstract "true"
-	
+	abstract function setColor(r : UInt8, g : UInt8, b : UInt8)
+	abstract function drawRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8)
+	abstract function fillRect(x : UInt8, y : UInt8, width : UInt8, height : UInt8)
+
 	function drawDigit(x: UInt8, y: UInt8, d : UInt8, size : UInt8) do
 		if (d < 1) do
 			fillRect(x,y,size, 5*size)
@@ -91,15 +106,15 @@ thing fragment Display includes DisplayMsgs {
 			fillRect(x,y+2*size,3*size, size)
 		end
 	end
-	
+
 	function drawThingML(px : Int16, py : Int16) do
-		
+
 		setColor(255,255,255) // WHITE
 		fillRect(px,py,108, 13)
-	
+
 		var x : Int16 = px+1
 		var y : Int16 = py+1
-	
+
 		setColor(80,80,80) // Official ThingML GREY
 		//setColor(108,108,108) // C64 Palette
 		// T
@@ -128,7 +143,7 @@ thing fragment Display includes DisplayMsgs {
 		fillRect(x+62,y+9,12,2)
 		fillRect(x+69,y+5,5,2)
 		fillRect(x+72,y+7,2,2)
-		
+
 		setColor(232,141,10) // Official ThingML ORANGE
 		//setColor(111, 79, 38) // C64 Palette
 		// M
@@ -140,7 +155,7 @@ thing fragment Display includes DisplayMsgs {
 		fillRect(x+95,y+0,2,11)
 		fillRect(x+95,y+9,11,2)
 	end
-	
+
 	function drawInteger(x : UInt8, y : UInt8, v : Int16, digits : UInt8, scale:UInt8) do
 		clearInteger(x, y, digits, scale)
 		var val : Int16 = v
@@ -151,53 +166,53 @@ thing fragment Display includes DisplayMsgs {
 			d = d - 1
 		end
 	end
-	
+
 	function clearInteger(x : UInt8, y : UInt8, digits : UInt8, scale:UInt8) do
 		setColor(bg_r, bg_g, bg_b)
 		fillRect(x,y,(digits*4-1)*scale, 5*scale)
 		setColor(fg_r, fg_g, fg_b)
 	end
-	
-	provided port display 
+
+	provided port display
 	{
 		receives create, destroy, update
 		receives clear, setColor, setBGColor, drawRect, fillRect, drawInteger, drawThingML
 		sends displayReady, displayError
 	}
-	
+
 	property bg_r : UInt8 = 0
 	property bg_g : UInt8 = 0
 	property bg_b : UInt8 = 0
-	
+
 	property fg_r : UInt8 = 0
 	property fg_g : UInt8 = 0
 	property fg_b : UInt8 = 0
-	
+
 	statechart SC init Wait {
-		
+
 		state Wait {
-			transition -> Running event e : display?create action initDisplay(e.xsize, e.ysize)	
+			transition -> Running event e : display?create action initDisplay(e.xsize, e.ysize)
 		}
-		
+
 		state Running {
-			
-			on entry do 
+
+			on entry do
 				display!displayReady()
 			end
-			
-			internal event e : display?setColor action do fg_r = e.r fg_g = e.g fg_b= e.b setColor(e.r, e.g, e.b) end 
+
+			internal event e : display?setColor action do fg_r = e.r fg_g = e.g fg_b= e.b setColor(e.r, e.g, e.b) end
 			internal event e : display?setBGColor action do bg_r = e.r bg_g = e.g bg_b= e.b end
 			internal event e : display?clear action clearScreen()
 			internal event e : display?drawRect action drawRect(e.x, e.y, e.width, e.height)
 			internal event e : display?fillRect action fillRect(e.x, e.y, e.width, e.height)
 			internal event e : display?update action updateDisplay()
-			
+
 			internal event e : display?drawInteger action drawInteger(e.x, e.y, e.v, e.digits, e.scale)
 			internal event e : display?drawThingML action drawThingML(e.x, e.y)
-			
-			transition -> Destroyed event display?destroy action destroyDisplay()	
+
+			transition -> Destroyed event display?destroy action destroyDisplay()
 		}
-		
+
 		final state Destroyed {
 			// Nothing
 		}

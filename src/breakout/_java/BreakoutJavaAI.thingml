@@ -5,19 +5,12 @@ import "timer.thingml" from stl
 configuration BreakoutJava
 {
 	instance game : BreakoutGameJava
-	instance disp : DisplayJava
-	//instance ctrl : VelocityController
+	instance disp : HeadlessDisplay
 	instance timer : TimerJava
+	instance ctrl : BasicIAController
 
 	connector game.clock => timer.timer
-  //connector ctrl.clock => timer.timer
-
 	connector game.display => disp.display
-	//connector game.controller => ctrl.controls
-
-	//connector ctrl.ctrl_in => disp.vctrl
-
-	instance ctrl : BasicIAController
 	connector game.controller => ctrl.controls
 	connector ctrl.game => game.ia
 }

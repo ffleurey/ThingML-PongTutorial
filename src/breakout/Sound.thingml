@@ -1,4 +1,4 @@
-import "lib/_Datatypes.thingml"
+import "datatypes.thingml" from stl
 
 thing fragment SoundMsgs {
 	message tone(freq : UInt16, time : UInt16)

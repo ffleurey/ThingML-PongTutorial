@@ -1,11 +1,25 @@
-import "lib/_Timer.thingml"
 import "Display.thingml"
 import "Sound.thingml"
 import "Controller.thingml"
 
-thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IAControllerMsg {
+thing fragment BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, IAControllerMsg {
 	message lostBall();
 	message nextLevel();
+
+	abstract function quit()
+
+	function log() do
+		println "lives: ", lives
+		println "score: ", score
+		println "level: ", level
+		println "bx: ", bx
+		println "by: ", by
+		println "dx: ", dx
+		println "dy: ", dy
+		println "padx: ", padx
+		println "pady: ", pady
+		println "############"
+	end
 
 	required port clock {
 		sends timer_start, timer_cancel
@@ -18,7 +32,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 		sends tone
 	}
 
-	required port display
+	optional required port display
 	@sync_send "true"
 	{
 		receives displayReady, displayError
@@ -39,14 +53,22 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 		receives lostBall, nextLevel
 	}
 
+	optional required port req_game {
+		sends lostBall, nextLevel
+	}
+
+	provided port pro_game {
+		receives lostBall, nextLevel
+	}
+
 	// Size of the real display
 	readonly property XDISPSIZE : UInt8 = 160
 	readonly property YDISPSIZE : UInt8 = 128
 
 	// Virtual size of the "game area"
 	readonly property SCALE : Int16 = 64
-	readonly property XMAX 	: Int16 = XDISPSIZE * SCALE
-	readonly property YMAX 	: Int16 = YDISPSIZE * SCALE
+	readonly property XMAX 	: Int16 = XDISPSIZE as Int16 * SCALE
+	readonly property YMAX 	: Int16 = YDISPSIZE as Int16 * SCALE
 
 	// Walls around the play area
 	property TOP 	: Int16 = 14 * SCALE 		// Leave 12 pixels on the top for scores
@@ -73,7 +95,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 	property bgcolor : UInt8[3]
 	property fgcolor : UInt8[3]
 
-  property period : Int16 = 33
+  property period : UInt16 = 33
 
 	readonly property tone1 : UInt16 = 440 //Hz
 	readonly property tone2: UInt16 = 880  //Hz
@@ -96,11 +118,11 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 	end
 
 	function eraseBall() do
-		var bs : UInt8 = (br*2)/SCALE 	// Size of the ball on the actual display
+		var bs : Int16 = (br*2)/SCALE 	// Size of the ball on the actual display
 
 		if (prevBX > 0) do				// Erase the previous ball
 			display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
-			display!fillRect(prevBX, prevBY, bs, bs)
+			display!fillRect(prevBX as UInt8, prevBY as UInt8, bs as UInt8, bs as UInt8)
 		end
 
 		prevBX = -1
@@ -108,7 +130,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 	end
 
 	function drawBall() do
-		var bs : UInt8 = (br*2)/SCALE 	// Size of the ball on the actual display
+		var bs : Int16 = (br*2)/SCALE 	// Size of the ball on the actual display
 
 		eraseBall()
 
@@ -118,7 +140,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 
 		//display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
 		display!setColor(183, 199, 111)
-		display!fillRect(prevBX, prevBY, bs, bs)
+		display!fillRect(prevBX as UInt8, prevBY as UInt8, bs as UInt8, bs as UInt8)
 	end
 
 
@@ -127,16 +149,15 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 	property prevPY	: Int16 = -1
 
 	function erasePad() do
-		var ps : UInt8 = padlen/SCALE 	// Size of the pad on the actual display
-
+		var ps : Int16 = padlen/SCALE 	// Size of the pad on the actual display
 		if (prevPX > 0) do				// Erase the previous ball
 			display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
-			display!fillRect(prevPX, prevPY, ps, 4)
+			display!fillRect(prevPX as UInt8, prevPY as UInt8, ps as UInt8, 4)
 		end
 	end
 
 	function drawPad() do
-		var ps : UInt8 = padlen/SCALE 	// Size of the pad on the actual display
+		var ps : Int16 = padlen/SCALE 	// Size of the pad on the actual display
 
 		erasePad()
 
@@ -144,10 +165,10 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 		prevPY = pady / SCALE
 
 		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
-		display!fillRect(prevPX, prevPY, ps, 4)
+		display!fillRect(prevPX as UInt8, prevPY as UInt8, ps as UInt8, 4)
 	end
 
-	function drawCountDown(c : UInt8) do
+	function drawCountDown(c : Int16) do
 		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
 		if (c > 0) do
 			display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
@@ -162,10 +183,16 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 
 	function drawWalls() do
 		display!setColor(fgcolor[0],fgcolor[1],fgcolor[2])
-		display!fillRect(LEFT/SCALE-1, TOP/SCALE-1, (RIGHT-LEFT)/SCALE+1, 1)
-		display!fillRect(LEFT/SCALE-1, BOTTOM/SCALE, (RIGHT-LEFT)/SCALE+1, 1)
-		display!fillRect(LEFT/SCALE-1, TOP/SCALE, 1, (BOTTOM-TOP)/SCALE)
-		display!fillRect(RIGHT/SCALE, TOP/SCALE, 1, (BOTTOM-TOP)/SCALE)
+		readonly var left : UInt8 = (LEFT/SCALE) as UInt8
+		readonly var right : UInt8 = (RIGHT/SCALE) as UInt8
+		readonly var top : UInt8 = (TOP/SCALE) as UInt8
+		readonly var bottom : UInt8 = (BOTTOM/SCALE) as UInt8
+		readonly var xcenter : UInt8 = ((RIGHT-LEFT)/SCALE) as UInt8
+		readonly var ycenter : UInt8 = ((BOTTOM-TOP)/SCALE) as UInt8
+		display!fillRect(left-1, top-1, xcenter+1, 1)
+		display!fillRect(left-1, bottom, xcenter+1, 1)
+		display!fillRect(left-1, top, 1, ycenter)
+		display!fillRect(right, top, 1, ycenter)
 	end
 
 	// Bricks variable
@@ -173,16 +200,16 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 	readonly property BRICK_HEIGHT : UInt8 = 9
 	property bricks : UInt8[BRICK_ROWS]
 
-	function bitIsSet(variable : UInt8, bit : UInt8) : Boolean return `((1 << `& bit &`) & `& variable &`) != 0`
+	function bitIsSet(variable : UInt8, bit : UInt8) : Boolean return (`((1 << `& bit &`) & `& variable &`) != 0`) as Boolean
 	//function setBit(variable : UInt8, bit : UInt8) : UInt8 return ``&variable&` | (1 << `& bit &`)`
-	function unsetBit(variable : UInt8, bit : UInt8) : UInt8 return ``&variable&` & ~(1 << `& bit &`)`
+	abstract function unsetBit(variable : UInt8, bit : UInt8) : UInt8 //return ``&variable&` & ~(1 << `& bit &`)` //it appears that ~ is ^ in Go (yes, we need a PIM version of those operators...)
 
 	function createBricks() do
-		var y : Int8 = 0
+		var y : UInt8 = 0
 		while (y<BRICK_ROWS) do
 			bricks[y] = 0xFF
 			// Draw the Bricks
-			var x : Int8 = 0
+			var x : UInt8 = 0
 			while(x < 8) do
 				if ( bitIsSet(bricks[y], x) ) do
 					drawBrick(x, y)
@@ -195,9 +222,9 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 
 	function bricksLeft() : UInt8 do
 		var result : UInt8 = 0
-		var y : Int8 = 0
+		var y : UInt8 = 0
 		while (y<BRICK_ROWS) do
-			var x : Int8 = 0
+			var x : UInt8 = 0
 			while(x < 8) do
 				if ( bitIsSet(bricks[y], x) ) do
 					result = result + 1
@@ -210,29 +237,31 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 	end
 
 	function drawBrick(x : UInt8, y: UInt8) do
-		var bx : Int16 = LEFT + ((RIGHT-LEFT)/8) * x
-		var by : Int16 = TOP + 20 * SCALE + BRICK_HEIGHT * y * SCALE
+		readonly var bx : UInt8 = ((LEFT + ((RIGHT-LEFT)/8) * x as Int16)/SCALE+1) as UInt8
+		readonly var by : UInt8 = ((TOP + 20 * SCALE + BRICK_HEIGHT as Int16 * y as Int16 * SCALE)/SCALE+1) as UInt8
+		readonly var w : UInt8 = (((RIGHT-LEFT)/8)/SCALE-2) as UInt8
+		readonly var h : UInt8 = (BRICK_HEIGHT-2) as UInt8
 		display!setColor(155,103,89)
-		display!fillRect(bx/SCALE+1, by/SCALE+1, ((RIGHT-LEFT)/8)/SCALE-2, BRICK_HEIGHT-2)
+		display!fillRect(bx, by, w, h)
 		display!setColor(100,56,43)
-		display!drawRect(bx/SCALE+1, by/SCALE+1, ((RIGHT-LEFT)/8)/SCALE-2, BRICK_HEIGHT-2)
+		display!drawRect(bx, by, w, h)
 	end
 
 	function removeBrick(x : UInt8, y: UInt8) do
-		var bx : Int16 = LEFT + ((RIGHT-LEFT)/8) * x
-		var by : Int16 = TOP + 20 * SCALE + BRICK_HEIGHT * y * SCALE
+		readonly var bx : UInt8 = ((LEFT + ((RIGHT-LEFT)/8) * x as Int16)/SCALE+1) as UInt8
+		readonly var by : UInt8 = ((TOP + 20 * SCALE + BRICK_HEIGHT as Int16 * y as Int16 * SCALE)/SCALE+1) as UInt8
 		display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
-		display!fillRect(bx/SCALE+1, by/SCALE+1, ((RIGHT-LEFT)/8)/SCALE-2, BRICK_HEIGHT-2)
+		display!fillRect(bx, by, (((RIGHT-LEFT)/8)/SCALE-2) as UInt8, BRICK_HEIGHT-2)
 		bricks[y] = unsetBit(bricks[y], x)
 	end
 
 	function collideBrick(xpos : Int16, ypos : Int16) : Boolean do
-		var bry : Int8 = (ypos - TOP - 20*SCALE) / (BRICK_HEIGHT*SCALE)
+		var bry : Int16 = (ypos as Int16 - TOP - 20*SCALE) / (BRICK_HEIGHT as Int16*SCALE)
 		var result : Boolean = false
-		if (bry >= 0 and bry < BRICK_ROWS) do // There may be a collision
-			var brx : Int8 = (xpos - LEFT) / ((RIGHT - LEFT) / 8)
-			if (bitIsSet(bricks[bry], brx)) do // There is a brick
-				removeBrick(brx, bry)
+		if (bry >= 0 and bry < BRICK_ROWS as Int16) do // There may be a collision
+			var brx : Int16 = (xpos as Int16 - LEFT) / ((RIGHT - LEFT) / 8)
+			if (bitIsSet(bricks[bry], brx as UInt8)) do // There is a brick
+				removeBrick(brx as UInt8, bry as UInt8)
 				result = true
 			end
 		end
@@ -247,11 +276,11 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 		display!setColor(158,209,130)
 		display!setBGColor(fgcolor[0],fgcolor[1],fgcolor[2])
 		display!setColor(bgcolor[0],bgcolor[1],bgcolor[2])
-		display!drawInteger(6, 2, level, 2, 2)
+		display!drawInteger(6, 2, level as Int16, 2, 2)
 	end
 
 	function incrementScore(diff : Int8) do
-		score = score + diff
+		score = score + diff as Int16
 		if (score < 0) score = 0
 		drawScore()
 	end
@@ -280,10 +309,10 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 
 		internal event e : controller?position action do
 			// Map the controller values [-100..100] to the pad position
-			var center : Int32 = (RIGHT - LEFT - padlen)
-			center = e.x * center
+			var center : Int32 = (RIGHT as Int32 - LEFT as Int32 - padlen as Int32)
+			center = e.x as Int32 * center
 			center = center / 200
-			padx = LEFT + center + (RIGHT - LEFT) / 2
+			padx = (LEFT as Int32 + center + (RIGHT as Int32 - LEFT as Int32) / 2) as Int16
 		end
 
 		state INIT {
@@ -307,7 +336,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 		}
 
 		state LAUNCH {
-			property countdown : Int8
+			property countdown : UInt8
 
 			on entry do
 				clock!timer_start(0, 33)
@@ -321,7 +350,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 			guard t.id == 0 and countdown > 0 action do
 				clock!timer_start(0, 33)
 				drawPad() // Draw the Pad
-				if ((countdown % 30) == 0) drawCountDown(countdown/30)
+				if ((countdown % 30) == 0) drawCountDown(countdown as Int16/30)
 				countdown = countdown - 1
 				display!update()
 			end
@@ -346,10 +375,10 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 				bx = bx + dx
 				by = by + dy
 
-				var wl : UInt16 = LEFT + br
-				var wr : UInt16 = RIGHT - br
-				var wt : UInt16 = TOP + br
-				var wb : UInt16 = BOTTOM - br
+				var wl : Int16 = LEFT + br
+				var wr : Int16 = RIGHT - br
+				var wt : Int16 = TOP + br
+				var wb : Int16 = BOTTOM - br
 
 				// Check for collisions with the walls
 				if (bx < wl) do
@@ -364,6 +393,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 					bx = 2*wr-bx
 					incrementScore(-1)
 				end
+
 				if (by < wt)	do
 				  sound!tone(tone2, tone_duration)
 				  dy = -dy
@@ -372,6 +402,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 				end
 				else if (by > wb)	do
 					game!lostBall()
+					req_game!lostBall()
 					//ia!lostBall()
 				end
 
@@ -396,7 +427,10 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 				  sound!tone(tone1, tone_duration)
 					dy = -dy // Update the direction of the ball
 					incrementScore(10)
-					if (bricksLeft() == 0) game!nextLevel()
+					if (bricksLeft() == 0) do
+						game!nextLevel()
+						req_game!nextLevel()
+					end
 				end
 
 				drawBall() // Draw the Ball
@@ -404,11 +438,15 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 				ia!updateIA(bx, by, padx, pady)
 				display!update()
 
-        		clock!timer_start(0, period)
+				log()
+        clock!timer_start(0, period)
 			end
 
 			transition -> LOSTBALL event game?lostBall action clock!timer_cancel(0)
 			transition -> NEXTLEVEL event game?nextLevel action clock!timer_cancel(0)
+
+			transition -> LOSTBALL event pro_game?lostBall action clock!timer_cancel(0)
+			transition -> NEXTLEVEL event pro_game?nextLevel action clock!timer_cancel(0)
 		}
 
 		state LOSTBALL {
@@ -448,7 +486,7 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 
 		}
 
-		state GAMEOVER {
+		final state GAMEOVER {
 
 			on entry do
 				eraseBall()
@@ -462,6 +500,9 @@ thing BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, ControllerMsgs, I
 				display!drawInteger(23, 40, score, 5, 6)
 				display!drawThingML(26, 87)
 				display!update()
+
+
+				quit()
 			end
 
 		}

@@ -1,5 +1,4 @@
 import "DisplayBrowser.thingml"
-import "SoundBrowser.thingml"
 import "BreakoutGameBrowser.thingml"
 import "timer.thingml" from stl
 
@@ -7,16 +6,11 @@ configuration BreakoutBrowser
 {
 	instance game : BreakoutGameBrowser
 	instance disp : DisplayBrowser
-	instance sound : SoundControllerBrowser
-	instance ctrl : VelocityController
 	instance timer : TimerJS
+	instance ctrl : BasicIAController
 
 	connector game.clock => timer.timer
-  connector ctrl.clock => timer.timer
-
 	connector game.display => disp.display
-	connector game.sound => sound.sound
 	connector game.controller => ctrl.controls
-
-	connector ctrl.ctrl_in => disp.vctrl
+	connector ctrl.game => game.ia
 }
