@@ -5,7 +5,7 @@ protocol Timer;
 
 thing BreakoutGameArduino includes DefaultBreakoutGame {
 	function quit() println "done!"
-	function timestamp() : Int64 return `millis()` as Int64
+	function timestamp() : UInt32 return `millis()` as UInt32
 }
 
 configuration BreakoutArduino 

@@ -9,7 +9,7 @@ thing BreakoutGameGo includes BreakoutGame
 		`os.Exit(0);`
 	end
 	
-	function timestamp() : Int64 return `time.Now().UnixNano() / int64(time.Millisecond)` as Int64
+	function timestamp() : UInt32 return `uint32(time.Now().UnixNano() / int64(time.Millisecond))` as UInt32
 	
 	function unsetBit(variable : UInt8, bit : UInt8) : UInt8 return (``&variable&` & ^(1 << `& bit &`)`) as UInt8
 }

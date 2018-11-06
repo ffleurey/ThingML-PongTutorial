@@ -10,8 +10,8 @@ thing BreakoutGamePosix includes DefaultBreakoutGame
 		`exit(0);`
 	end
 	
-	function timestamp() : Int64 do
+	function timestamp() : UInt32 do
 		`clock_gettime(CLOCK_REALTIME, &t);`
-		return `t.tv_sec*1000 + t.tv_nsec/1000000` as Int64
+		return `t.tv_sec*1000 + t.tv_nsec/1000000` as UInt32
 	end
 }

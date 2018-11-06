@@ -7,5 +7,5 @@ thing BreakoutGameJava includes DefaultBreakoutGame {
 		`System.exit(0);`
 	end
 	
-	function timestamp() : Int64 return `System.currentTimeMillis()` as Int64
+	function timestamp() : UInt32 return `System.currentTimeMillis()` as UInt32
 }

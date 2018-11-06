@@ -6,18 +6,18 @@ thing fragment BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, Controll
 	message lostBall();
 	message nextLevel();
 
-	property lastTimestamp : Int64 = 0
+	property lastTimestamp : UInt32 = 0
 	
 	abstract function quit()
-	abstract function timestamp() : Int64
+	abstract function timestamp() : UInt32
 
 	function log() do
-		var ts : Int64
+		var ts : UInt32
 		if (lastTimestamp == 0) do
 			ts = 0
 			lastTimestamp = timestamp()
 		end else do
-			var t : Int64 = timestamp()
+			var t : UInt32 = timestamp()
 			ts = t - lastTimestamp
 			lastTimestamp = t
 		end

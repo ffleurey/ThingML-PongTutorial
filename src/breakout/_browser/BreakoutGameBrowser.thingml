@@ -2,5 +2,5 @@ import "../DefaultBreakoutGame.thingml"
 
 thing BreakoutGameBrowser includes DefaultBreakoutGame {
 	function quit() println "done!"
-	function timestamp() : Int64 return `Date.now()` as Int64
+	function timestamp() : UInt32 return `Date.now()` as UInt32
 }

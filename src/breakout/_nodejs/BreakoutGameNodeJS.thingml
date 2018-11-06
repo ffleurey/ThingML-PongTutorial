@@ -6,5 +6,5 @@ thing BreakoutGameNodeJS includes DefaultBreakoutGame {
 		`process.exit(0);`
 	end
 	
-	function timestamp() : Int64 return `process.hrtime.bigint()/1000000n` as Int64
+	function timestamp() : UInt32 return `process.hrtime.bigint()/1000000n` as UInt32
 }
