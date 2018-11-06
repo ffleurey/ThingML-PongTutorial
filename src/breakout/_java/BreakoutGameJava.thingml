@@ -1,8 +1,11 @@
 import "../DefaultBreakoutGame.thingml"
 
 thing BreakoutGameJava includes DefaultBreakoutGame {
+	
 	function quit() do
 		println "done!"
 		`System.exit(0);`
 	end
+	
+	function timestamp() : Int64 return `System.currentTimeMillis()` as Int64
 }

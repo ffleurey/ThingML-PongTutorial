@@ -6,19 +6,22 @@ thing fragment BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, Controll
 	message lostBall();
 	message nextLevel();
 
+	property lastTimestamp : Int64 = 0
+	
 	abstract function quit()
+	abstract function timestamp() : Int64
 
 	function log() do
-		println "lives: ", lives
-		println "score: ", score
-		println "level: ", level
-		println "bx: ", bx
-		println "by: ", by
-		println "dx: ", dx
-		println "dy: ", dy
-		println "padx: ", padx
-		println "pady: ", pady
-		println "############"
+		var ts : Int64
+		if (lastTimestamp == 0) do
+			ts = 0
+			lastTimestamp = timestamp()
+		end else do
+			var t : Int64 = timestamp()
+			ts = t - lastTimestamp
+			lastTimestamp = t
+		end
+		println "ts:", ts, ",lives:", lives, ",score:", score, ",level:", level, ",bx:", bx, ",by:", by, ",padx:", padx
 	end
 
 	required port clock {

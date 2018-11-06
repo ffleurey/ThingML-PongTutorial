@@ -1,8 +1,17 @@
 import "../DefaultBreakoutGame.thingml"
 
-thing BreakoutGamePosix includes DefaultBreakoutGame {
+thing BreakoutGamePosix includes DefaultBreakoutGame 
+@c_header "#include <time.h>
+#include <stdlib.h>"
+@c_global "struct timespec t;"
+{
 	function quit() do
 		println "done!"
 		`exit(0);`
+	end
+	
+	function timestamp() : Int64 do
+		`clock_gettime(CLOCK_REALTIME, &t);`
+		return `t.tv_sec*1000 + t.tv_nsec/1000000` as Int64
 	end
 }
