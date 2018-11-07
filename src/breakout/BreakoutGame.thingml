@@ -7,11 +7,13 @@ thing fragment BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, Controll
 	message nextLevel();
 
 	property lastTimestamp : UInt32 = 0
+	property counter : UInt8 = 0
 	
 	abstract function quit()
 	abstract function timestamp() : UInt32
+	abstract function usedMemory() : UInt32
 
-	function log() do
+	function log(logMem : Boolean) do
 		var ts : UInt32
 		if (lastTimestamp == 0) do
 			ts = 0
@@ -22,6 +24,10 @@ thing fragment BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, Controll
 			lastTimestamp = t
 		end
 		println "ts:", ts, ",lives:", lives, ",score:", score, ",level:", level, ",bx:", bx, ",by:", by, ",padx:", padx
+		
+		if (counter == 0 or logMem) println "#usedMem:", usedMemory()
+		counter++
+		if (counter == 10) counter = 0
 	end
 
 	required port clock {
@@ -441,7 +447,7 @@ thing fragment BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, Controll
 				ia!updateIA(bx, by, padx, pady)
 				display!update()
 
-				log()
+				log(false)
         clock!timer_start(0, period)
 			end
 
@@ -461,6 +467,7 @@ thing fragment BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, Controll
 				erasePad()
 				drawLives()
 				display!update()
+				log(true)
 			end
 
 			transition -> LAUNCH event t : clock?timer_timeout
@@ -504,7 +511,7 @@ thing fragment BreakoutGame includes TimerMsgs, DisplayMsgs, SoundMsgs, Controll
 				display!drawThingML(26, 87)
 				display!update()
 
-
+				log(true)
 				quit()
 			end
 

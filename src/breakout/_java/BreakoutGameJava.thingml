@@ -8,4 +8,6 @@ thing BreakoutGameJava includes DefaultBreakoutGame {
 	end
 	
 	function timestamp() : UInt32 return `System.currentTimeMillis()` as UInt32
+	
+	function usedMemory() : UInt32 return `Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()` as UInt32
 }

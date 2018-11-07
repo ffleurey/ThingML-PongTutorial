@@ -7,4 +7,6 @@ thing BreakoutGameNodeJS includes DefaultBreakoutGame {
 	end
 	
 	function timestamp() : UInt32 return `process.hrtime.bigint()/1000000n` as UInt32
+	
+	function usedMemory() : UInt32 return `process.memoryUsage().heapUsed` as UInt32
 }

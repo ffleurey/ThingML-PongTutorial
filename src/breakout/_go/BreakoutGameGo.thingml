@@ -3,6 +3,7 @@ import "../BreakoutGame.thingml"
 thing BreakoutGameGo includes BreakoutGame 
 @go_import `os`
 @go_import `time`
+@go_import `runtime`
 {
 	function quit() do
 		println "done!"
@@ -10,6 +11,12 @@ thing BreakoutGameGo includes BreakoutGame
 	end
 	
 	function timestamp() : UInt32 return `uint32(time.Now().UnixNano() / int64(time.Millisecond))` as UInt32
+	
+	function usedMemory() : UInt32 do
+		`var m runtime.MemStats
+		runtime.ReadMemStats(&m)`
+		return `m.HeapAlloc` as UInt32
+	end
 	
 	function unsetBit(variable : UInt8, bit : UInt8) : UInt8 return (``&variable&` & ^(1 << `& bit &`)`) as UInt8
 }
