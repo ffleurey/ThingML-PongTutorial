@@ -1,12 +1,14 @@
 import "DisplayArduino.thingml"
 import "../DefaultBreakoutGame.thingml"
 
-protocol Timer;
-
 thing BreakoutGameArduino includes DefaultBreakoutGame {
 	function quit() println "done!"
 	function timestamp() : UInt32 return `millis()` as UInt32
+	function usedMemory() : UInt32 do
+		return -1
+	end
 }
+
 
 configuration BreakoutArduino 
 @arduino_stdout "Serial"
@@ -16,9 +18,9 @@ configuration BreakoutArduino
 	instance game : BreakoutGameArduino
 	instance disp : HeadlessDisplay
 	instance ctrl : BasicIAController
+	instance timer : TimerArduino
 	
-	connector game.clock over Timer
-	
+	connector game.clock => timer.timer	
 	connector game.display => disp.display
 	connector game.controller => ctrl.controls
 	connector ctrl.game => game.ia 

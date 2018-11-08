@@ -3,4 +3,7 @@ import "../DefaultBreakoutGame.thingml"
 thing BreakoutGameBrowser includes DefaultBreakoutGame {
 	function quit() println "done!"
 	function timestamp() : UInt32 return `Date.now()` as UInt32
+	function usedMemory() : UInt32 do
+		return -1
+	end
 }
