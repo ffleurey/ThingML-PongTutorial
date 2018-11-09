@@ -2,6 +2,7 @@ import "BreakoutGameGo.thingml"
 import "timer.thingml" from stl
 
 configuration BreakoutGo
+@docker
 {
 	instance game : BreakoutGameGo
 	instance disp : HeadlessDisplay

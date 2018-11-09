@@ -1,11 +1,10 @@
-import "DisplayPosix.thingml"
+import "../Display.thingml"
 import "BreakoutGamePosix.thingml"
 import "timer.thingml" from stl
 
 configuration BreakoutPosix
-@add_c_libraries "SDL2"
-//@debug "true"
-//@debug_messages "*"
+@c_static_linking "true"
+@docker
 {
 	instance game : BreakoutGamePosix
 	instance disp : HeadlessDisplay

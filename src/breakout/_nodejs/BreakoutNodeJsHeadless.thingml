@@ -2,6 +2,7 @@ import "BreakoutGameNodeJS.thingml"
 import "timer.thingml" from stl
 
 configuration BreakoutNodeJS
+@docker
 {
 	instance game : BreakoutGameNodeJS
 	instance disp : HeadlessDisplay

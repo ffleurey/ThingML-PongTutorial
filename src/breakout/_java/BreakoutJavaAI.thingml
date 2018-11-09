@@ -3,6 +3,7 @@ import "BreakoutGameJava.thingml"
 import "timer.thingml" from stl
 
 configuration BreakoutJava
+@docker
 {
 	instance game : BreakoutGameJava
 	instance disp : HeadlessDisplay
